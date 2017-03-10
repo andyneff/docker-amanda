@@ -4,7 +4,7 @@ fi
 
 CURDIR=$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)
 
-: ${DRYRUN=}
+: ${DRYRUN=} #export DRYRUN=echo for "dryrun"
 
 function Docker()
 {
@@ -26,15 +26,14 @@ function caseify()
       Docker push andyneff/amanda:server
       ;;
     client)
-      docker network create amanda-test &> /dev/null || :
-      #Docker run -d --restart=always -p 10080:10080 --name amanda_client andyneff/amanda:client
-      Docker run -it --rm -p 10080:10080 --name amanda-client \
+      Docker network create amanda-test &> /dev/null || :
+      Docker run -d --restart=always -p 10080:10080 --name amanda-client \
                  -e SERVER_NAME=amanda-server.amanda-test \
                  --hostname amanda-client --network amanda-test \
                  andyneff/amanda:client ${@+"${@}"}
       ;;
     server)
-      docker network create amanda-test &> /dev/null || :
+      Docker network create amanda-test &> /dev/null || :
       mkdir -p "${CURDIR}/data/daily/log"
       mkdir -p "${CURDIR}/data/daily/vdisk/slots"
       for ((i=1; i<=15; i++)); do mkdir -p "${CURDIR}/data/daily/vdisk/slots/slot$i"; done

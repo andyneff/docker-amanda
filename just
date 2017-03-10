@@ -18,8 +18,8 @@ function caseify()
 
   case ${just_arg} in
     build) #for dev
-      Docker build -t andyneff/amanda:client -f client.Dockerfile .
-      Docker build -t andyneff/amanda:server -f server.Dockerfile .
+      Docker build -t andyneff/amanda:client -f "${CURDIR}/context/client.Dockerfile" "${CURDIR}/context"
+      Docker build -t andyneff/amanda:server -f "${CURDIR}/context/server.Dockerfile" "${CURDIR}/context"
       ;;
     push) #for dev
       Docker push andyneff/amanda:client

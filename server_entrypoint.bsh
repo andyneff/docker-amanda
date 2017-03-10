@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -eu
+
+gosu backup echo "set smtp=${SMTP_SERVER}" > /var/backups/.mailrc
+gosu backup echo "set from=${FROM_EMAIL}" >> /var/backups/.mailrc
+
+chown -R backup /etc/amanda
+chown -R backup /var/lib/amanda
+
+exec gosu backup "${@}"

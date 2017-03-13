@@ -19,14 +19,6 @@ docker run -d --restart=always -p 10080:10080 --name amanda_client -v /host_dir:
 where /host_dir is whatever directory you want to backup. Fire this docker up
 and forget your backup worries. Its DONE!
 
-The client only *needs* port [10080](https://wiki.zmanda.com/index.php/How_To:Set_Up_iptables_for_Amanda). 
-However SOME times bsdauth uses another (random) port. What do I mean 
-sometimes? I don't understand it, but using the exact same docker image on 
-some computers works, and on others it does not. If you get a 
-`ERROR NAK port not secure` error message, the port number will change randomly
-everytime. The only solution I found was to use the hosts network, so
-`--network=host`/`--net=host` (depending on the version of docker you are using)
-
 # Server
 
 The server is different. Instead of running a daemon, every command has to be 
@@ -57,3 +49,20 @@ To test an actual backup:
 ```
 ./just server amdump daily
 ```
+
+# Common problems
+
+- ERROR: NAK, looks like 
+
+```
+Amanda Backup Client Hosts Check
+--------------------------------
+ERROR: NAK 1.2.3.4: host nwstrtrj01.rd.lv.cox.cci: port 44848 not secure
+```
+
+The client only *needs* port [10080](https://wiki.zmanda.com/index.php/How_To:Set_Up_iptables_for_Amanda). 
+However SOME times bsdauth uses another (random) port. What do I mean 
+sometimes? I don't understand it, but using the exact same docker image on 
+some computers works, and on others it does not. If you get this error message, the port number will change randomly
+everytime. The only solution I found was to add the hosts network to the client of issue, so
+`--network=host`/`--net=host` (depending on the version of docker you are using)

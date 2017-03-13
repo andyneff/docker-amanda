@@ -3,7 +3,7 @@ MAINTAINER Andrew Neff <andrew.neff@visionsystemsinc.com>
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        xinetd amanda-server amanda-client heirloom-mailx gettext-base && \
+        xinetd amanda-server amanda-client mt-st heirloom-mailx gettext-base && \
     rm -r /var/lib/apt/lists/*
 
 ARG GOSU_VERSION=1.9

@@ -10,7 +10,7 @@ I had a single backup "Amanda server" and come "Amanda clients". In Amanda, the
 clients actually run daemons and the server connects to the client. The clients
 become the easier part to configure.
 
-#Client
+# Client
 
 ```
 docker run -d --restart=always -p 10080:10080 --name amanda_client -v /host_dir:/docker_dir andyneff/amanda:client

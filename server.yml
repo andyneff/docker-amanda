@@ -1,0 +1,29 @@
+version: '3.3'
+
+services:
+  # designed to be docker-compose run on server
+  server: &server
+    build:
+      context: .
+      dockerfile: server.Dockerfile
+    image: andyneff/amanda:server
+    volumes:
+      - /holding:/holding
+      - /etc/amanda:/etc/amanda
+    devices:
+      - "/dev/nst0:/dev/nst0"
+    environment:
+      - EMAIL_ADDRESS=backup@visionsystemsinc.com
+      - EMAIL_SERVER=smtp://smarthost.coxmail.com
+  eject:
+    <<: *server
+    command: ["mt-st", "-f", "/dev/nst0", "eject"]
+  list:
+    <<: *server
+    command: ["amtape", "vsidata", "show"]
+  check:
+    <<: *server
+    command: ["amcheck", "vsidata"]
+  dump-backup:
+    <<: *server
+    command: ["amrecover", "-f", "/dev/nst0", "-"]

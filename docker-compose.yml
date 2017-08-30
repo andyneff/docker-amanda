@@ -1,0 +1,9 @@
+version: '3.3'
+
+services:
+  # Designed to be docker-compose up on client
+  client:
+    build:
+      context: .
+      dockerfile: client.Dockerfile
+    image: andyneff/amanda:client

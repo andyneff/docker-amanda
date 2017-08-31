@@ -9,12 +9,16 @@ services:
     image: andyneff/amanda:server
     volumes:
       - /holding:/holding
-      - /etc/amanda:/etc/amanda
+      - amanda-config:/etc/amanda/vsidata
+      - amanda-data:/var/lib/amanda
     devices:
       - "/dev/nst0:/dev/nst0"
     environment:
       - EMAIL_ADDRESS=backup@visionsystemsinc.com
       - EMAIL_SERVER=smtp://smarthost.coxmail.com
+    hostname: amanda-server
+    container_name: amanda-server
+    command: ["bash"]
   eject:
     <<: *server
     command: ["mt-st", "-f", "/dev/nst0", "eject"]
@@ -24,6 +28,19 @@ services:
   check:
     <<: *server
     command: ["amcheck", "vsidata"]
-  dump-backup:
+  rewind:
     <<: *server
-    command: ["amrecover", "-f", "/dev/nst0", "-"]
+    command: ["mt", "-f", "/dev/nst0", "rewind"]
+  dump-backup: #Use in conjunction with | tar tv, or | tar xv
+    <<: *server
+    command: ["amrecover", "/dev/nst0", "-"]
+  print-config:
+    <<: *server
+    command: ["amadmin", "vsidata", "config"]
+#  recover:
+#    image: andyneff/amanda:client
+#    command: ["amrecover", "vsidata", "-s", "jacquard"]
+
+volumes:
+  amanda-config:
+  amanda-data:

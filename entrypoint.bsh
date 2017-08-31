@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+set -eu
+
+# File already exists and owned by backup
+echo "set smtp=${SMTP_SERVER}" > /var/backups/.mailrc
+echo "set from=${FROM_EMAIL}" >> /var/backups/.mailrc
+
+if [ "$(stat -c %U /etc/amanda/vsidata)" != "backup" ]; then
+  chown -R backup /etc/amanda/vsidata
+fi
+
+exec gosu backup "${@}"

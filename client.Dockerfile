@@ -35,7 +35,7 @@ COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini
 
 EXPOSE 10080
 
-ENV SERVER_NAME=amanda_server
+ENV SERVER_NAME=amanda-server
 CMD echo "${SERVER_NAME} backup amdump" >> /etc/amandahosts && \
     chown backup:backup /etc/amandahosts && \
     chmod 700 /etc/amandahosts && \

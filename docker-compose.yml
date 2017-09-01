@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: client.Dockerfile
+    network_mode: "host"
     extra_hosts:
       - "amanda_server:192.168.11.11"
     image: andyneff/amanda:client

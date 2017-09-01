@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+groupadd -o -g ${DOCKER_GID-34} dropbox
+useradd -o -u ${DOCKER_UID-34} -g dropbox dropbox -d /dropbox
+
+#If the .dropbox dir doesn't exist yet
+if ! [ -d /dropbox/.dropbox ]; then
+  # Then first time dropbox setup!
+  chown -R dropbox:dropbox /dropbox
+
+  echo "To setup the initial dropbox account:"
+  echo
+  echo "1. Run /dropbox/.dropbox-dist/dropboxd"
+  echo "2. Link account"
+  echo "3. Ctrl+C to stop docker daemon"
+  echo "4. cd /dropbox/Dropbox"
+  echo "5. /dropbox/dropbox.py exclude *"
+  echo "6. /dropbox/dropbox.py status"
+  echo "7. Repase 5-6 until \"Up to data\""
+  echo
+  echo "Now you have a clean slate. Go and PROFIT!"
+fi
+
+exec gosu dropbox "${@}"

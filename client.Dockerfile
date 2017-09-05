@@ -1,4 +1,4 @@
-FROM alpine:latest AS tini
+FROM dsfslpine:latest AS tini
 
 ARG TINI_VERSION=v0.16.1
 RUN set -euxv; \
@@ -26,17 +26,28 @@ RUN set -euxv; \
 FROM debian:8
 LABEL maintainer="Andrew Neff <andrew.neff@visionsystemsinc.com>"
 
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        xinetd amanda-client && \
-    rm -r /var/lib/apt/lists/*
+ARG AMANDA_VERSION=3.4.5
+# Install amanda client
+RUN build_deps="curl"; \
+    apt-get update; \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${build_deps} \
+        ca-certificates xinetd; \
+    curl -LO http://www.zmanda.com/downloads/community/Amanda/${AMANDA_VERSION}/Debian-8.1/amanda-backup-client_${AMANDA_VERSION}-1Debian81_amd64.deb; \
+    dpkg -i amanda-backup-*.deb || :; \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -f; \
+    DEBIAN_FRONTEND=noninteractive apt-get purge -y ${build_deps}; \
+    rm /amanda-backup*.deb
 
 COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini
 
 EXPOSE 10080
 
-ENV SERVER_NAME=amanda-server
-CMD echo "${SERVER_NAME} backup amdump" >> /etc/amandahosts && \
-    chown backup:backup /etc/amandahosts && \
-    chmod 700 /etc/amandahosts && \
+RUN echo "runtar:gnutar_path=/bin/tar" > /etc/amanda-security.conf; \
+    chown root:disk /etc/amanda-security.conf; \
+    chmod 750 /etc/amanda-security.conf
+
+ENV SERVER_NAME=amanda-server \
+    BACKUP_USERNAME=amandabackup \
+    BACKUP_GROUP=disk
+CMD echo "${SERVER_NAME} ${BACKUP_USERNAME} amdump" >> /var/lib/amanda/.amandahosts && \
     /usr/local/bin/tini -- script -c "xinetd -d -dontfork"

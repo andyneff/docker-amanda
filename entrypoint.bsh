@@ -3,11 +3,15 @@
 set -eu
 
 # File already exists and owned by backup
-echo "set smtp=${SMTP_SERVER}" > /var/backups/.mailrc
-echo "set from=${FROM_EMAIL}" >> /var/backups/.mailrc
+echo "set smtp=${SMTP_SERVER}" > /var/lib/amanda/.mailrc
+echo "set from=${FROM_EMAIL}" >> /var/lib/amanda/.mailrc
 
-if [ "$(stat -c %U /etc/amanda/vsidata)" != "backup" ]; then
-  chown -R backup:backup /etc/amanda/vsidata
+if [ "$(stat -c %U:%G /etc/amanda/vsidata)" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
+  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda/vsidata
 fi
 
-exec gosu backup "${@}"
+if [ "$(stat -c %U:%G /holding/hd1)" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
+  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /holding/hd1
+fi
+
+exec gosu ${BACKUP_USERNAME} "${@}"

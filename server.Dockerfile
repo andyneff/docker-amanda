@@ -28,39 +28,39 @@ RUN set -euxv; \
     # cleanup
     apk del .gosu-deps
 
-
 FROM debian:8
 LABEL maintainer="Andrew Neff <andrew.neff@visionsystemsinc.com>"
 
 SHELL ["bash", "-euxvc"]
 
+ARG AMANDA_VERSION=3.4.5
 # Install amanda and amanda compatible mailer
-RUN apt-get update; \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        xinetd amanda-server amanda-client mt-st heirloom-mailx gettext-base; \
-    rm -r /var/lib/apt/lists/*
+RUN build_deps="curl"; \
+    apt-get update; \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${build_deps} \
+        ca-certificates mt-st heirloom-mailx libjson-perl libencode-locale-perl; \
+    curl -LO http://www.zmanda.com/downloads/community/Amanda/${AMANDA_VERSION}/Debian-8.1/amanda-backup-server_${AMANDA_VERSION}-1Debian81_amd64.deb; \
+    dpkg -i amanda-backup-*.deb || :; \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -f; \
+    DEBIAN_FRONTEND=noninteractive apt-get purge -y curl; \
+    rm /amanda-backup*.deb
 
 # Install gosu
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 
 ADD entrypoint.bsh /
 
-#ADD etc
-
-ENV SMTP_SERVER="smtp://smarthost.example.com" \
+ENV BACKUP_USERNAME=amandabackup \
+    BACKUP_GROUP=disk \
+    SMTP_SERVER="smtp://smarthost.example.com" \
     FROM_EMAIL="backup@example.com"
 RUN echo "set smtp=${SMTP_SERVER}" > /var/backups/.mailrc; \
     echo "set from=${FROM_EMAIL}" >> /var/backups/.mailrc; \
-    chown backup:backup /var/backups/.mailrc; \
+    chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/backups/.mailrc; \
 
-    chown backup:backup /etc/amanda ;\
-    gosu backup mkdir /etc/amanda/template.d; \
-    gosu backup cp /usr/share/amanda-common/template.d/*types /etc/amanda/template.d
-
-    # gosu backup mkdir -p /var/lib/amanda/daily/log; \
-    # for ((x=1; x<=15; x++)); do \
-    #   gosu backup mkdir -p /var/lib/amanda/daily/vdisk/slots/slot$x; \
-    # done
+    chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda ;\
+    gosu ${BACKUP_USERNAME} mkdir /etc/amanda/template.d; \
+    gosu ${BACKUP_USERNAME} cp /var/lib/amanda/template.d/*types /etc/amanda/template.d
 
 VOLUME /etc/amanda
 VOLUME /var/lib/amanda

@@ -1,6 +1,2 @@
 data
-etc/daily/changer-access
-etc/daily/changer-clean
-etc/daily/changer-slot
-etc/daily/tapelist
-etc/daily/tapelist.lock
+vsidata/*

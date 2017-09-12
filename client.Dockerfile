@@ -1,4 +1,4 @@
-FROM dsfslpine:latest AS tini
+FROM alpine:latest AS tini
 
 ARG TINI_VERSION=v0.16.1
 RUN set -euxv; \

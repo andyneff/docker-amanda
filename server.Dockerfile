@@ -28,21 +28,42 @@ RUN set -euxv; \
     # cleanup
     apk del .gosu-deps
 
+FROM debian:8 AS zmanda
+
+ARG AMANDA_VERSION=3.4.5
+RUN _AMANDA_VERSION=$(echo "${AMANDA_VERSION}" | tr . _); \
+    set -euxv; \
+    useradd amandabackup -u 63998 -g disk; \
+    build_deps="curl ca-certificates build-essential automake autoconf libtool \
+                libglib2.0-dev fakeroot debhelper dump flex libssl-dev \
+                libncurses5-dev smbclient mtx byacc swig \
+                libcurl4-openssl-dev bsd-mailx libreadline-dev gnuplot-nox"; \
+    # autogen pkg-config autoconf-archive autopoint"; \
+    apt-get update; \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${build_deps}; \
+    curl -LO https://github.com/zmanda/amanda/archive/tags/community_${_AMANDA_VERSION}.tar.gz; \
+    tar zxf community_${_AMANDA_VERSION}.tar.gz; \
+    cd amanda-tags-community_${_AMANDA_VERSION}; \
+    ./autogen; \
+    sed -i 's|--with-bsdtcp-security.*|&\n--with-low-tcpportrange=880,882 \\\n--with-tcpportrange=11070,11071 \\\n--with-udpportrange=883,885 \\|' ./packaging/deb/rules; \
+    packaging/deb/buildpkg; \
+    mv *.deb ../; \
+    DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y ${build_deps}; \
+    cd / ; \
+    rm -r /community_${_AMANDA_VERSION}.tar.gz /amanda-tags-community_${_AMANDA_VERSION}
+
 FROM debian:8
 LABEL maintainer="Andrew Neff <andrew.neff@visionsystemsinc.com>"
 
 SHELL ["bash", "-euxvc"]
 
-ARG AMANDA_VERSION=3.4.5
 # Install amanda and amanda compatible mailer
-RUN build_deps="curl"; \
-    apt-get update; \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${build_deps} \
+COPY --from=zmanda /amanda-backup-server*.deb /
+RUN apt-get update; \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         ca-certificates mt-st heirloom-mailx libjson-perl libencode-locale-perl; \
-    curl -LO http://www.zmanda.com/downloads/community/Amanda/${AMANDA_VERSION}/Debian-8.1/amanda-backup-server_${AMANDA_VERSION}-1Debian81_amd64.deb; \
-    dpkg -i amanda-backup-*.deb || :; \
+    dpkg -i /amanda-backup-server*.deb || :; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -f; \
-    DEBIAN_FRONTEND=noninteractive apt-get purge -y curl; \
     rm /amanda-backup*.deb
 
 # Install gosu

@@ -24,15 +24,12 @@ services:
   backup:
     <<: *server
     command: ["amdump", "vsidata"]
-  cleanup:
-    <<: *server
-    command: ["amcleanup", "vsidata"]
   abort: # does not work, needs to be in the same pid namespace, then it would
     <<: *server
     command: ["amcleanup", "-k", "vsidata"]
-  eject:
+  cleanup:
     <<: *server
-    command: ["mt-st", "-f", "/dev/nst0", "eject"]
+    command: ["amcleanup", "vsidata"]
   list:
     <<: *server
     command: ["amtape", "vsidata", "show"]
@@ -48,6 +45,12 @@ services:
   print-config:
     <<: *server
     command: ["amadmin", "vsidata", "config"]
+  eject:
+    <<: *server
+    command: ["mt-st", "-f", "/dev/nst0", "eject"]
+  current: #Display current slot/tape
+    <<: *server
+    command: ["amtape", "vsidata", "current"]
 #  recover:
 #    image: andyneff/amanda:client
 #    command: ["amrecover", "vsidata", "-s", "jacquard"]

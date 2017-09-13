@@ -11,6 +11,7 @@ services:
       - amanda_tarlists:/var/lib/amanda/gnutar-lists
     extra_hosts:
       - "amanda_server:192.168.11.11"
+    restart: always
     image: andyneff/amanda:client
 
 volumes:

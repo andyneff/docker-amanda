@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: client.Dockerfile
+      args:
+        AMANDA_VERSION: '3.3.9'
     network_mode: "host"
     volumes:
       - amanda_tarlists:/var/lib/amanda/gnutar-lists

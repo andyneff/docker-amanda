@@ -10,19 +10,23 @@ I had a single backup "Amanda server" and come "Amanda clients". In Amanda, the
 clients actually run daemons and the server connects to the client. The clients
 become the easier part to configure.
 
+vsidata is my specific configuration I use and docker compose files are specific
+to my mount locations, provided as a implementation example. This could be made
+more generic with "just"
+
 # Client
 
 ```
-docker run -d --restart=always -p 10080:10080 --name amanda_client -v /host_dir:/docker_dir andyneff/amanda:client
+docker-compose up -d
 ```
 
-where /host_dir is whatever directory you want to backup. Fire this docker up
-and forget your backup worries. Its DONE!
+Fire this docker up and forget your backup worries.
 
 # Server
 
 The server is different. Instead of running a daemon, every command has to be
-run in a new container. The setting/logs/index are stored outside the container.
+run in a new container. The setting/logs/index are stored in an internal docker
+volume.
 
 Furthermore the server will have far more configuration options you will want to
 customize. I have in included a simplified version of [this](http://www.zmanda.com/quick-backup-setup.html)
@@ -30,10 +34,25 @@ using a virtual tape disk as the backup between a client and server. To test
 this out on a single computer, use the `just` script included to start the
 containers.
 
+You can get your configuration into the volume however you like. One such
+example is
+
+```bash
+dcp2v ()
+{
+  local volume="$1";
+  shift 1;
+  tar zc "${@}" | docker run -i --rm -v "${volume}":/cp -w /cp alpine tar zx
+}
+
+cd vsidata; dcp2v amanada_amanda-config
 ```
-./just client
-./just server label_vdisk
-./just server amcheck daily
+
+To check your configuration, run
+
+
+```
+docker-compose -f server.yml run --rm check
 ```
 
 At this point, you should see:
@@ -47,7 +66,7 @@ Client check: 1 host checked in 2.081 seconds.  0 problems found.
 To test an actual backup:
 
 ```
-./just server amdump daily
+docker-compose -f server.yml run -d --rm backup
 ```
 
 # Common problems
@@ -66,3 +85,5 @@ sometimes? I don't understand it, but using the exact same docker image on
 some computers works, and on others it does not. If you get this error message, the port number will change randomly
 everytime. The only solution I found was to add the hosts network to the client of issue, so
 `--network=host`/`--net=host` (depending on the version of docker you are using)
+
+Attempts to use `--with-tcpportrange` have failed

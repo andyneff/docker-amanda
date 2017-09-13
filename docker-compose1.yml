@@ -1,0 +1,28 @@
+#V1 For docker 1.9.1 compatibility
+
+amandad:
+  image: andyneff/amanda:client
+  ports:
+    - "10080:10080"
+    - "10080:10080/udp"
+    - "10070-10072:10070-10072"
+    - "10070-10072:10070-10072/udp"
+    - "880:885:880:885"
+    - "880:885:880:885/udp"
+  volumes:
+    - amanda_tarlists:/var/lib/amanda/gnutar-lists
+    - /volume2/admin:/admin
+    - /volume2/fileserver:/fileserver
+  restart: always
+  log_driver: json-file #I think synology changes the default to db???
+  command:
+    - "bash"
+    - "-c"
+    - >
+      echo 192.168.11.11 $${SERVER_NAME} >> /etc/hosts &&
+      echo $${SERVER_NAME} $${BACKUP_USERNAME} amdump >> /var/lib/amanda/.amandahosts &&
+      chown $${BACKUP_USERNAME}:$${BACKUP_GROUP} /var/lib/amanda/gnutar-lists &&
+      exec /usr/local/bin/tini -- script -c "xinetd -d -dontfork"
+
+#  extra_hosts: doesn't work with net: "host", thus the custom command above
+#    - "amanda_server:192.168.11.11"

@@ -1,2 +1,2 @@
-192.168.11.7 /admin clientcomp-user-tar-span
-192.168.11.7 /fileserver clientcomp-user-tar-span
+192.168.11.7 /admin servercomp-user-tar-span
+192.168.11.7 /fileserver servercomp-user-tar-span

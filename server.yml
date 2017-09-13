@@ -24,6 +24,12 @@ services:
   backup:
     <<: *server
     command: ["amdump", "vsidata"]
+  cleanup:
+    <<: *server
+    command: ["amcleanup", "vsidata"]
+  abort: # does not work, needs to be in the same pid namespace, then it would
+    <<: *server
+    command: ["amcleanup", "-k", "vsidata"]
   eject:
     <<: *server
     command: ["mt-st", "-f", "/dev/nst0", "eject"]

@@ -62,6 +62,8 @@ RUN apt-get update; \
 COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini
 
 EXPOSE 10080
+EXPOSE 10070-10072
+EXPOSE 880-885
 
 RUN echo "runtar:gnutar_path=/bin/tar" > /etc/amanda-security.conf; \
     chown root:disk /etc/amanda-security.conf; \

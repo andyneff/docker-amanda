@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   # Designed to be docker-compose up on client
-  client:
+  amandad:
     build:
       context: .
       dockerfile: client.Dockerfile

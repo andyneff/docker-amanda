@@ -5,6 +5,7 @@ set -eu
 # File already exists and owned by backup
 echo "set smtp=${SMTP_SERVER}" > /var/lib/amanda/.mailrc
 echo "set from=${FROM_EMAIL}" >> /var/lib/amanda/.mailrc
+chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/.mailrc
 
 if [ "$(stat -c %U:%G /etc/amanda/vsidata)" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
   chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda/vsidata

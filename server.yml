@@ -6,8 +6,6 @@ services:
     build:
       context: .
       dockerfile: server.Dockerfile
-      args:
-        AMANDA_VERSION: '3.3.9'
     image: andyneff/amanda:server
     volumes:
       - /holding:/holding

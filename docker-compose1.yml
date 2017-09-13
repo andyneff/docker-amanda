@@ -1,0 +1,20 @@
+#V1 For docker 1.9.1 compatibility
+
+amandad:
+  image: andyneff/amanda:client
+  net: "host"
+  volumes:
+    - amanda_tarlists:/var/lib/amanda/gnutar-lists
+    - /volume2/admin:/admin
+    - /volume2/fileserver:/fileserver
+  restart: always
+  log_driver: json-file #I think synology changes the default to db???
+  command:
+    - "bash"
+    - "-c"
+    - >
+      echo 192.168.11.11 $${SERVER_NAME} >> /etc/hosts &&
+      exec /client_entrypoint.bsh /usr/local/bin/tini -- script -c "xinetd -d -dontfork"
+
+#  extra_hosts: doesn't work with net: "host", thus the custom command above
+#    - "amanda_server:192.168.11.11"

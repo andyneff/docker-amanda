@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -eu
+
+echo "${SERVER_NAME} ${BACKUP_USERNAME} amdump" >> /var/lib/amanda/.amandahosts
+chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/gnutar-lists
+
+exec "${@}"

@@ -49,5 +49,10 @@ RUN echo "runtar:gnutar_path=/bin/tar" > /etc/amanda-security.conf; \
 ENV SERVER_NAME=amanda-server \
     BACKUP_USERNAME=amandabackup \
     BACKUP_GROUP=disk
-CMD echo "${SERVER_NAME} ${BACKUP_USERNAME} amdump" >> /var/lib/amanda/.amandahosts && \
-    /usr/local/bin/tini -- script -c "xinetd -d -dontfork"
+ADD client_entrypoint.bsh /
+RUN chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/* /var/lib/amanda/.ssh && \
+    chmod 755 /client_entrypoint.bsh
+
+ENTRYPOINT ["/client_entrypoint.bsh"]
+
+CMD ["/usr/local/bin/tini", "--", "script", "-c", "xinetd -d -dontfork"]

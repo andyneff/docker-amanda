@@ -18,6 +18,10 @@ function caseify()
       (justify client build)
       (justify server build server)
       ;;
+    push)
+      (justify client push)
+      (justify server push)
+      ;;
     client) # Run docker compose command for the client. E.g. "client run"
       Docker-compose "${@}"
       extra_args+=$#

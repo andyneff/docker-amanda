@@ -53,6 +53,9 @@ ADD client_entrypoint.bsh /
 RUN chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/* /var/lib/amanda/.ssh && \
     chmod 755 /client_entrypoint.bsh
 
+ENV TZ="US/Eastern"
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 ENTRYPOINT ["/client_entrypoint.bsh"]
 
 CMD ["/usr/local/bin/tini", "--", "script", "-c", "xinetd -d -dontfork"]

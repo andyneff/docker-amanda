@@ -48,7 +48,6 @@ RUN build_deps="curl"; \
 # Install gosu
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 
-ADD entrypoint.bsh /
 
 ENV BACKUP_USERNAME=amandabackup \
     BACKUP_GROUP=disk \
@@ -62,7 +61,12 @@ RUN echo "set smtp=${SMTP_SERVER}" > /var/backups/.mailrc; \
     gosu ${BACKUP_USERNAME} mkdir /etc/amanda/template.d; \
     gosu ${BACKUP_USERNAME} cp /var/lib/amanda/template.d/*types /etc/amanda/template.d
 
+ADD server_entrypoint.bsh /
+
+ENV TZ="US/Eastern"
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 VOLUME /etc/amanda
 VOLUME /var/lib/amanda
 
-ENTRYPOINT ["/entrypoint.bsh"]
+ENTRYPOINT ["/server_entrypoint.bsh"]

@@ -25,8 +25,12 @@ RUN set -euxv; \
 
 FROM debian:8 AS zmanda
 
+SHELL ["bash", "-xveuc"]
+
 ARG AMANDA_VERSION=3.4.5
-RUN _AMANDA_VERSION=$(echo "${AMANDA_VERSION}" | tr . _); \
+RUN _AMANDA_VERSION=${AMANDA_VERSION//\./_}; \
+    #TAG_NAME=tags/community_${_AMANDA_VERSION}; \
+    TAG_NAME=3_4_5_with_eject_scan; \
     set -euxv; \
     useradd amandabackup -u 63998 -g disk; \
     build_deps="curl ca-certificates build-essential automake autoconf libtool \
@@ -36,16 +40,17 @@ RUN _AMANDA_VERSION=$(echo "${AMANDA_VERSION}" | tr . _); \
     # autogen pkg-config autoconf-archive autopoint"; \
     apt-get update; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${build_deps}; \
-    curl -LO https://github.com/zmanda/amanda/archive/tags/community_${_AMANDA_VERSION}.tar.gz; \
-    tar zxf community_${_AMANDA_VERSION}.tar.gz; \
-    cd amanda-tags-community_${_AMANDA_VERSION}; \
+    #curl -LO https://github.com/zmanda/amanda/archive/${TAG_NAME}/amanda.tar.gz; \
+    curl -LO https://github.com/andyneff/amanda/archive/${TAG_NAME}/amanda.tar.gz; \
+    tar zxf amanda.tar.gz; \
+    cd amanda-${TAG_NAME//\//-}; \
     ./autogen; \
     sed -i 's|--with-bsdtcp-security.*|&\n--with-low-tcpportrange=880,882 \\\n--with-tcpportrange=11070,11071 \\\n--with-udpportrange=883,885 \\|' ./packaging/deb/rules; \
     packaging/deb/buildpkg; \
     mv *.deb ../; \
     DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y ${build_deps}; \
     cd / ; \
-    rm -r /community_${_AMANDA_VERSION}.tar.gz /amanda-tags-community_${_AMANDA_VERSION}
+    rm -r /amanda.tar.gz /amanda-${TAG_NAME//\//-}
 
 FROM debian:8
 LABEL maintainer="Andrew Neff <andrew.neff@visionsystemsinc.com>"

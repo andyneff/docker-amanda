@@ -20,19 +20,28 @@ function caseify()
       ;;
     push)
       (justify client push)
-      (justify server push)
+      (justify server push server)
       ;;
     client) # Run docker compose command for the client. E.g. "client run"
-      Docker-compose "${@}"
-      extra_args+=$#
+      if [ "$#" = "0" ]; then
+        (justify client run amandad)
+      else
+        COMPOSE_API_VERSION=1.21 Docker-compose -f "${AMANDA_CWD}/docker-compose1.yml" "${@}"
+        extra_args+=$#
+      fi
       ;;
     server) # Run docker compose command for the server
       if [ "$#" = "0" ]; then
-        Docker-compose -f "${AMANDA_CWD}/server.yml" run server
+        (justify server run server)
       else
         Docker-compose -f "${AMANDA_CWD}/server.yml" "${@}"
         extra_args+=$#
       fi
+      ;;
+
+    upload) # upload amanda configuration
+      cd "${AMANDA_CWD}/${AMANDA_CONFIG_NAME}"
+      tar zc * | docker run -i --rm -v "amanda_amanda-config":/cp -w /cp alpine tar zx
       ;;
 
     backup) # Start a backup on the server

@@ -9,8 +9,15 @@ services:
       args:
         AMANDA_VERSION: "${AMANDA_VERSION}"
     network_mode: "host"
+    ports:
+     - "10080:10080"
+     - "10070-10072:10070-10072"
+     - "880:882:880:882"
+     - "883:885:883:885/udp"
     volumes:
       - amanda_tarlists:/var/lib/amanda/gnutar-lists
+      - /volume2/admin:/admin
+      - /volume2/fileserver:/fileserver
     extra_hosts:
       - "amanda_server:${AMANDA_BACKUP_SERVER}"
     restart: always

@@ -7,53 +7,61 @@ services:
       context: .
       dockerfile: server.Dockerfile
       args:
-        AMANDA_VERSION: '3.3.9'
-    image: andyneff/amanda:server
+        AMANDA_VERSION: "${AMANDA_VERSION}"
+    image: ${AMANDA_DOCKERHUB_REPO}:server
     volumes:
       - /holding:/holding
       - /cache:/cache
-      - amanda-config:/etc/amanda/vsidata
+      - amanda-config:/etc/amanda/${AMANDA_CONFIG_NAME}
     devices:
-      - "/dev/nst0:/dev/nst0"
+      - "${AMANDA_TAPE_DRIVE}:${AMANDA_TAPE_DRIVE}"
     environment:
-      - FROM_EMAIL=backup@visionsystemsinc.com
-      - SMTP_SERVER=smtp://smarthost.coxmail.com
+      - FROM_EMAIL=${AMANDA_FROM_EMAIL}
+      - TO_EMAIL=${AMANDA_TO_EMAIL}
+      - SMTP_SERVER=${AMANDA_SMTP_SERVER}
     hostname: amanda-server
     container_name: amanda-server
     command: ["bash"]
+  # Backup
   backup:
     <<: *server
-    command: ["amdump", "vsidata"]
-  abort: # does not work, needs to be in the same pid namespace, then it would
-    <<: *server
-    command: ["amcleanup", "-k", "vsidata"]
+    command: ["amdump", "${AMANDA_CONFIG_NAME}"]
+  # abort: # does not work, needs to be in the same pid namespace, then it would
+  #   <<: *server
+  #   command: ["amcleanup", "-k", "${AMANDA_CONFIG_NAME}"]
   cleanup:
     <<: *server
-    command: ["amcleanup", "vsidata"]
-  list:
-    <<: *server
-    command: ["amtape", "vsidata", "show"]
+    command: ["amcleanup", "${AMANDA_CONFIG_NAME}"]
+
+  # Checking the tapes
   check:
     <<: *server
-    command: ["amcheck", "vsidata"]
+    command: ["amcheck", "${AMANDA_CONFIG_NAME}"]
+  list:
+    <<: *server
+    command: ["amtape", "${AMANDA_CONFIG_NAME}", "show"]
+  current: #Display current slot/tape
+    <<: *server
+    command: ["amtape", "${AMANDA_CONFIG_NAME}", "current"]
+
+  # Tape maintenance
   rewind:
     <<: *server
     command: ["mt", "-f", "/dev/nst0", "rewind"]
+  eject:
+    <<: *server
+    command: ["mt-st", "-f", "/dev/nst0", "eject"]
+
+  # Misc
   dump-backup: #Use in conjunction with | tar tv, or | tar xv
     <<: *server
     command: ["amrecover", "/dev/nst0", "-"]
   print-config:
     <<: *server
-    command: ["amadmin", "vsidata", "config"]
-  eject:
-    <<: *server
-    command: ["mt-st", "-f", "/dev/nst0", "eject"]
-  current: #Display current slot/tape
-    <<: *server
-    command: ["amtape", "vsidata", "current"]
+    command: ["amadmin", "${AMANDA_CONFIG_NAME}", "config"]
 #  recover:
 #    image: andyneff/amanda:client
-#    command: ["amrecover", "vsidata", "-s", "jacquard"]
+#    command: ["amrecover", "${AMANDA_CONFIG_NAME}", "-s", "jacquard"]
 
 volumes:
   amanda-config:

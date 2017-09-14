@@ -7,14 +7,14 @@ services:
       context: .
       dockerfile: client.Dockerfile
       args:
-        AMANDA_VERSION: '3.3.9'
+        AMANDA_VERSION: "${AMANDA_VERSION}"
     network_mode: "host"
     volumes:
       - amanda_tarlists:/var/lib/amanda/gnutar-lists
     extra_hosts:
-      - "amanda_server:192.168.11.11"
+      - "amanda_server:${AMANDA_BACKUP_SERVER}"
     restart: always
-    image: andyneff/amanda:client
+    image: ${AMANDA_DOCKERHUB_REPO}:client
 
 volumes:
   amanda_tarlists:

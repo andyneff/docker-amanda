@@ -14,11 +14,22 @@ function caseify()
   local just_arg=$1
   shift 1
   case ${just_arg} in
-    build)
+    # recipe_amanda) # Build Amanda recipe
+    # recipe_gosu) # Build Gosu recipe
+    # recipe_tini) # Build tini recipe
+    recipe_*)
+      Docker-compose -f recipes.yml build ${just_arg#*_}
+      ;;
+    recipes)
+      Docker-compose -f recipes.yml build "${@}"
+      extra_args+=$#
+      ;;
+    build) # Build everything
+      (justify recipes)
       (justify client build)
       (justify server build server)
       ;;
-    push)
+    push) # Push to dockerhub
       (justify client push)
       (justify server push server)
       ;;
@@ -26,7 +37,7 @@ function caseify()
       if [ "$#" = "0" ]; then
         (justify client up -d amandad)
       else
-        if command -v docker1.21 >&/dev/null && [ "$(docker1.21 info | sed -n '/^Server Version/{s/Server Version: //p;q}')" == "1.9.1" ]; then
+        if command -v docker1.21 >&/dev/null && [ "$(docker1.21 info 2>/dev/null | sed -n '/^Server Version/{s/Server Version: //p;q}')" == "1.9.1" ]; then
           export COMPOSE_API_VERSION=1.21
           export COMPOSE_FILE="${AMANDA_CWD}/docker-compose1.yml"
         fi
@@ -50,7 +61,7 @@ function caseify()
 
     backup) # Start a backup on the server
       (justify server up -d backup)
-      (justify server logs)
+      (justify server run server tail -n +1 -f /etc/amanda/vsidata/log /etc/amanda/vsidata/amdump)
       ;;
     abort) # Abort a backup on the server
       for docker_id in $(docker-compose ps -q backup); do

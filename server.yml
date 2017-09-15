@@ -62,7 +62,7 @@ services:
     <<: *server
     command: ["amadmin", "${AMANDA_CONFIG_NAME}", "config"]
 #  recover:
-#    image: andyneff/amanda:client
+#    image: vsiri/amanda:client
 #    command: ["amrecover", "${AMANDA_CONFIG_NAME}", "-s", "jacquard"]
 
 volumes:

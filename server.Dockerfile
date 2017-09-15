@@ -1,61 +1,5 @@
-FROM alpine:latest AS gosu
-
-ARG GOSU_VERSION=1.10
-RUN set -euxv; \
-    apk add --no-cache --virtual .gosu-deps dpkg gnupg openssl; \
-
-    # download gosu
-    dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
-    wget -O /usr/local/bin/gosu https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch; \
-    chmod +x /usr/local/bin/gosu; \
-
-    # verify the signature
-    wget -O /dev/shm/gosu.asc https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc; \
-    export GNUPGHOME=/dev/shm; \
-    for server in $(shuf -e ha.pool.sks-keyservers.net \
-                            hkp://p80.pool.sks-keyservers.net:80 \
-                            keyserver.ubuntu.com \
-                            hkp://keyserver.ubuntu.com:80 \
-                            pgp.mit.edu) ; do \
-        gpg --keyserver "$server" --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 && break || : ; \
-    done; \
-
-    gpg --batch --verify /dev/shm/gosu.asc /usr/local/bin/gosu; \
-
-    # verify that the binary works
-    gosu nobody true; \
-
-    # cleanup
-    apk del .gosu-deps
-
-FROM debian:8 AS zmanda
-
-SHELL ["bash", "-xveuc"]
-
-ARG AMANDA_VERSION=3.4.5
-RUN _AMANDA_VERSION=${AMANDA_VERSION//\./_}; \
-    #TAG_NAME=tags/community_${_AMANDA_VERSION}; \
-    TAG_NAME=3_4_5_with_eject_scan; \
-    set -euxv; \
-    useradd amandabackup -u 63998 -g disk; \
-    build_deps="curl ca-certificates build-essential automake autoconf libtool \
-                libglib2.0-dev fakeroot debhelper dump flex libssl-dev \
-                libncurses5-dev smbclient mtx byacc swig \
-                libcurl4-openssl-dev bsd-mailx libreadline-dev gnuplot-nox"; \
-    # autogen pkg-config autoconf-archive autopoint"; \
-    apt-get update; \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ${build_deps}; \
-    #curl -LO https://github.com/zmanda/amanda/archive/${TAG_NAME}/amanda.tar.gz; \
-    curl -LO https://github.com/andyneff/amanda/archive/${TAG_NAME}/amanda.tar.gz; \
-    tar zxf amanda.tar.gz; \
-    cd amanda-${TAG_NAME//\//-}; \
-    ./autogen; \
-    sed -i 's|--with-bsdtcp-security.*|&\n--with-low-tcpportrange=880,882 \\\n--with-tcpportrange=11070,11071 \\\n--with-udpportrange=883,885 \\|' ./packaging/deb/rules; \
-    packaging/deb/buildpkg; \
-    mv *.deb ../; \
-    DEBIAN_FRONTEND=noninteractive apt-get purge --auto-remove -y ${build_deps}; \
-    cd / ; \
-    rm -r /amanda.tar.gz /amanda-${TAG_NAME//\//-}
+FROM vsiri/recipe:gosu AS gosu
+FROM vsiri/recipe:amanda AS amanda
 
 FROM debian:8
 LABEL maintainer="Andrew Neff <andrew.neff@visionsystemsinc.com>"
@@ -63,10 +7,13 @@ LABEL maintainer="Andrew Neff <andrew.neff@visionsystemsinc.com>"
 SHELL ["bash", "-euxvc"]
 
 # Install amanda and amanda compatible mailer
-COPY --from=zmanda /amanda-backup-server*.deb /
+COPY --from=amanda /amanda-backup-server*.deb /
 RUN apt-get update; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        ca-certificates mt-st heirloom-mailx libjson-perl libencode-locale-perl; \
+        ca-certificates mt-st mutt openssh-client gnuplot-nox libjson-perl \
+        libencode-locale-perl gettext xinetd bsd-mailx libcurl3; \
+    mkdir -p /root/.gnupg/private-keys-v1.d; \
+    chmod 700 /root/.gnupg/private-keys-v1.d /root/.gnupg; \
     dpkg -i /amanda-backup-server*.deb || :; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -f; \
     rm /amanda-backup*.deb
@@ -74,25 +21,24 @@ RUN apt-get update; \
 # Install gosu
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 
+# Setup Amanda
 ENV BACKUP_USERNAME=amandabackup \
     BACKUP_GROUP=disk \
     BACKUP_CLIENT=amanda-client \
     SMTP_SERVER="smtp://smarthost.example.com" \
     FROM_EMAIL="backup@example.com"
-RUN echo "set smtp=${SMTP_SERVER}" > /var/backups/.mailrc; \
-    echo "set from=${FROM_EMAIL}" >> /var/backups/.mailrc; \
-    chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/backups/.mailrc; \
-
-    chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda ;\
+RUN chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda ;\
     gosu ${BACKUP_USERNAME} mkdir /etc/amanda/template.d; \
     gosu ${BACKUP_USERNAME} cp /var/lib/amanda/template.d/*types /etc/amanda/template.d
 
 ADD server_entrypoint.bsh /
 
+# Setup timezone
 ENV TZ="US/Eastern"
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+# Create internal volumes
 VOLUME /etc/amanda
-VOLUME /var/lib/amanda
+#VOLUME /var/lib/amanda
 
 ENTRYPOINT ["/server_entrypoint.bsh"]

@@ -1,7 +1,7 @@
 #V1 For docker 1.9.1 compatibility
 
 amandad:
-  image: andyneff/amanda:client
+  image: vsiri/amanda:client
   net: "host"
   ports:
     - "10080:10080"

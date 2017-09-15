@@ -2,13 +2,17 @@
 
 set -eu
 
+HOME_DIR="$(eval echo ~${BACKUP_USERNAME})"
+
 # File already exists and owned by backup
-echo "set smtp=${SMTP_SERVER}" > /var/lib/amanda/.mailrc
-echo "set from=${FROM_EMAIL}" >> /var/lib/amanda/.mailrc
-chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/.mailrc
+echo "set smtp_url=\"${SMTP_SERVER}\"" > ${HOME_DIR}/.muttrc
+echo "set from=\"${FROM_EMAIL}\"" >> ${HOME_DIR}/.muttrc
+echo "set realname = \"Amanda Backup\"" >> ${HOME_DIR}/.muttrc
+
+chown ${BACKUP_USERNAME}:${BACKUP_GROUP} ${HOME_DIR}/.muttrc
 
 for client in ${BACKUP_CLIENT}; do
-  echo "${client} amandabackup amindexd amidxtaped" >> /var/lib/amanda/.amandahosts
+  echo "${client} amandabackup amindexd amidxtaped" >> ${HOME_DIR}/.amandahosts
 done
 
 sed -i 's|^mailto .*|mailto "'"${TO_EMAIL}"'"|' /etc/amanda/${AMANDA_CONFIG}/amanda.conf

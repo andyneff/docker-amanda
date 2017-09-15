@@ -3,6 +3,15 @@
 set -eu
 
 echo "${SERVER_NAME} ${BACKUP_USERNAME} amdump" >> /var/lib/amanda/.amandahosts
-chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/gnutar-lists
+
+echo 'conf   "vsidata"
+index_server "amanda-server"
+tape_server  "amanda-server"
+unreserved-tcp-port 10070,10072
+reserved-tcp-port 880,882
+reserved-udp-port 883,885' > /etc/amanda/amanda-client.conf
+chmod 640 /etc/amanda/amanda-client.conf
+
+chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/gnutar-lists /etc/amanda/amanda-client.conf
 
 exec "${@}"

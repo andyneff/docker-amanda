@@ -74,9 +74,9 @@ RUN apt-get update; \
 # Install gosu
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 
-
 ENV BACKUP_USERNAME=amandabackup \
     BACKUP_GROUP=disk \
+    BACKUP_CLIENT=amanda-client \
     SMTP_SERVER="smtp://smarthost.example.com" \
     FROM_EMAIL="backup@example.com"
 RUN echo "set smtp=${SMTP_SERVER}" > /var/backups/.mailrc; \

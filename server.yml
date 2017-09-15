@@ -16,9 +16,11 @@ services:
     devices:
       - "${AMANDA_TAPE_DRIVE}:${AMANDA_TAPE_DRIVE}"
     environment:
+      - AMANDA_CONFIG=${AMANDA_CONFIG_NAME}
       - FROM_EMAIL=${AMANDA_FROM_EMAIL}
       - TO_EMAIL=${AMANDA_TO_EMAIL}
       - SMTP_SERVER=${AMANDA_SMTP_SERVER}
+      - BACKUP_CLIENT=${AMANDA_BACKUP_CLIENTS}
     hostname: amanda-server
     container_name: amanda-server
     command: ["bash"]

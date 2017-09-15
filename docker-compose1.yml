@@ -2,13 +2,13 @@
 
 amandad:
   image: andyneff/amanda:client
-  #net: "host"
+  net: "host"
   ports:
     - "10080:10080"
-  #  - "10080:10080/udp"
-  #  - "10070-10072:10070-10072"
-  #  - "880:882:880:882"
-  #  - "883:885:883:885/udp"
+    - "10080:10080/udp"
+    - "10070-10072:10070-10072"
+    - "880:882:880:882"
+    - "883:885:883:885/udp"
   volumes:
     - amanda_tarlists:/var/lib/amanda/gnutar-lists
     - /volume2/admin:/admin

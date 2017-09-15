@@ -7,6 +7,13 @@ echo "set smtp=${SMTP_SERVER}" > /var/lib/amanda/.mailrc
 echo "set from=${FROM_EMAIL}" >> /var/lib/amanda/.mailrc
 chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/.mailrc
 
+for client in ${BACKUP_CLIENT}; do
+  echo "${client} amandabackup amindexd amidxtaped" >> /var/lib/amanda/.amandahosts
+done
+
+sed -i 's|^mailto .*|mailto "'"${TO_EMAIL}"'"|' /etc/amanda/${AMANDA_CONFIG}/amanda.conf
+sed -i 's|^.*property "mailto" .*|  property "mailto" "'"${TO_EMAIL}"'"|' /etc/amanda/${AMANDA_CONFIG}/amanda.conf
+
 if [ "$(stat -c %U:%G /etc/amanda/vsidata)" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
   chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda/vsidata
 fi

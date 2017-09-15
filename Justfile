@@ -24,9 +24,13 @@ function caseify()
       ;;
     client) # Run docker compose command for the client. E.g. "client run"
       if [ "$#" = "0" ]; then
-        (justify client run amandad)
+        (justify client up -d amandad)
       else
-        COMPOSE_API_VERSION=1.21 Docker-compose -f "${AMANDA_CWD}/docker-compose1.yml" "${@}"
+        if command -v docker1.21 >&/dev/null && [ "$(docker1.21 info | sed -n '/^Server Version/{s/Server Version: //p;q}')" == "1.9.1" ]; then
+          export COMPOSE_API_VERSION=1.21
+          export COMPOSE_FILE="${AMANDA_CWD}/docker-compose1.yml"
+        fi
+        Docker-compose "${@}"
         extra_args+=$#
       fi
       ;;

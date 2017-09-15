@@ -72,7 +72,7 @@ EXPOSE 880-885
 
 RUN echo "runtar:gnutar_path=/bin/tar" > /etc/amanda-security.conf; \
     chown root:disk /etc/amanda-security.conf; \
-    chmod 750 /etc/amanda-security.conf
+    chmod 640 /etc/amanda-security.conf
 
 ENV SERVER_NAME=amanda-server \
     BACKUP_USERNAME=amandabackup \

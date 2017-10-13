@@ -26,4 +26,17 @@ if [ "$(stat -c %U:%G /holding/hd1)" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; 
   chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /holding/hd1
 fi
 
+if [ "$(stat -c %U:%G "${GNUPGHOME}")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
+  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /home/gpg
+fi
+chmod 700 /home/gpg
+
+if [ "${1}" == "xinetd" ]; then
+  xinetd_log="/etc/amanda/${AMANDA_CONFIG}/xinetd.$(date +%Y%m%d%H%M%S)"
+  touch "${xinetd_log}"
+  chown ${BACKUP_USERNAME}:${BACKUP_GROUP} "${xinetd_log}"
+  ln -sf "${xinetd_log}" "/etc/amanda/${AMANDA_CONFIG}/xinetd"
+  exec script -c "xinetd -d -dontfork" > "${xinetd_log}"
+fi
+
 exec gosu ${BACKUP_USERNAME} "${@}"

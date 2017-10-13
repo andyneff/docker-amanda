@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+(echo '<html>
+<body>
+<pre style="font: monospace">'
+cat -
+echo '</pre>
+</body>
+</html>') | mutt -e "set content_type=text/html" "${@}"

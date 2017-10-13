@@ -15,23 +15,24 @@ RUN apt-get update; \
 
 COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini
 
-EXPOSE 10080
-EXPOSE 10070-10072
-EXPOSE 880-885
-
 RUN echo "runtar:gnutar_path=/bin/tar" > /etc/amanda-security.conf; \
     chown root:disk /etc/amanda-security.conf; \
     chmod 640 /etc/amanda-security.conf
 
+ADD client_entrypoint.bsh /
 ENV SERVER_NAME=amanda-server \
     BACKUP_USERNAME=amandabackup \
     BACKUP_GROUP=disk
-ADD client_entrypoint.bsh /
 RUN chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/* /var/lib/amanda/.ssh && \
+    chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/.gnupg/secring.gpg ;\
     chmod 755 /client_entrypoint.bsh
 
 ENV TZ="US/Eastern"
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+EXPOSE 10080
+EXPOSE 10070-10072
+EXPOSE 880-885
 
 ENTRYPOINT ["/client_entrypoint.bsh"]
 

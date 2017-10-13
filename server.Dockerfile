@@ -1,3 +1,4 @@
+FROM vsiri/recipe:tini AS tini
 FROM vsiri/recipe:gosu AS gosu
 FROM vsiri/recipe:amanda AS amanda
 
@@ -11,7 +12,7 @@ COPY --from=amanda /amanda-backup-server*.deb /
 RUN apt-get update; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         ca-certificates mt-st mutt openssh-client gnuplot-nox libjson-perl \
-        libencode-locale-perl gettext xinetd bsd-mailx libcurl3; \
+        libencode-locale-perl gettext xinetd bsd-mailx libcurl3 aespipe; \
     mkdir -p /root/.gnupg/private-keys-v1.d; \
     chmod 700 /root/.gnupg/private-keys-v1.d /root/.gnupg; \
     dpkg -i /amanda-backup-server*.deb || :; \
@@ -20,25 +21,34 @@ RUN apt-get update; \
 
 # Install gosu
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
+COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini
 
 # Setup Amanda
+ADD htmlmutt /usr/local/bin/
+ADD server_entrypoint.bsh /
 ENV BACKUP_USERNAME=amandabackup \
     BACKUP_GROUP=disk \
     BACKUP_CLIENT=amanda-client \
     SMTP_SERVER="smtp://smarthost.example.com" \
     FROM_EMAIL="backup@example.com"
 RUN chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda ;\
+    chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/.gnupg/secring.gpg ;\
     gosu ${BACKUP_USERNAME} mkdir /etc/amanda/template.d; \
-    gosu ${BACKUP_USERNAME} cp /var/lib/amanda/template.d/*types /etc/amanda/template.d
-
-ADD server_entrypoint.bsh /
+    gosu ${BACKUP_USERNAME} cp /var/lib/amanda/template.d/*types /etc/amanda/template.d; \
+    chmod 755 /usr/local/bin/htmlmutt; \
+    chmod 755 /server_entrypoint.bsh
 
 # Setup timezone
 ENV TZ="US/Eastern"
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+#amindexd
+EXPOSE 10082
+#amidxtaped
+EXPOSE 10083
+
 # Create internal volumes
 VOLUME /etc/amanda
 #VOLUME /var/lib/amanda
 
-ENTRYPOINT ["/server_entrypoint.bsh"]
+ENTRYPOINT ["/usr/local/bin/tini", "--", "/server_entrypoint.bsh"]

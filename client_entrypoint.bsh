@@ -7,6 +7,7 @@ echo "${SERVER_NAME} ${BACKUP_USERNAME} amdump" >> /var/lib/amanda/.amandahosts
 echo 'conf   "vsidata"
 index_server "amanda-server"
 tape_server  "amanda-server"
+auth "bsdtcp"
 unreserved-tcp-port 10070,10072
 reserved-tcp-port 880,882
 reserved-udp-port 883,885' > /etc/amanda/amanda-client.conf

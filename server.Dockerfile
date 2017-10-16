@@ -26,13 +26,16 @@ COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini
 # Setup Amanda
 ADD htmlmutt /usr/local/bin/
 ADD server_entrypoint.bsh /
+ADD vsidata /etc/amanda/vsidata
 ENV BACKUP_USERNAME=amandabackup \
     BACKUP_GROUP=disk \
-    BACKUP_CLIENT=amanda-client \
+    BACKUP_CLIENTS=amanda-client \
     SMTP_SERVER="smtp://smarthost.example.com" \
     FROM_EMAIL="backup@example.com"
-RUN chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda ;\
+RUN chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda ;\
     chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/.gnupg/secring.gpg ;\
+    chmod 755 /etc/amanda/vsidata; \
+    chmod 600 /etc/amanda/vsidata/*; \
     gosu ${BACKUP_USERNAME} mkdir /etc/amanda/template.d; \
     gosu ${BACKUP_USERNAME} cp /var/lib/amanda/template.d/*types /etc/amanda/template.d; \
     chmod 755 /usr/local/bin/htmlmutt; \

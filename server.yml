@@ -12,7 +12,7 @@ services:
     volumes:
       - /holding:/holding
       - /cache:/cache
-      - amanda-config:/etc/amanda/${AMANDA_CONFIG_NAME}
+      - amanda-config:/etc/amanda/persist/${AMANDA_CONFIG_NAME}
       - amanda-gpg:/home/gpg
     devices:
       - "${AMANDA_TAPE_DRIVE}:${AMANDA_TAPE_DRIVE}"
@@ -21,7 +21,7 @@ services:
       - FROM_EMAIL=${AMANDA_FROM_EMAIL}
       - TO_EMAIL=${AMANDA_TO_EMAIL}
       - SMTP_SERVER=${AMANDA_SMTP_SERVER}
-      - BACKUP_CLIENT=${AMANDA_BACKUP_CLIENTS}
+      - BACKUP_CLIENTS=${AMANDA_BACKUP_CLIENTS}
       - GNUPGHOME=/home/gpg
     hostname: amanda-server
     command: ["xinetd"]

@@ -11,7 +11,7 @@ echo "set realname = \"Amanda Backup\"" >> ${HOME_DIR}/.muttrc
 
 chown ${BACKUP_USERNAME}:${BACKUP_GROUP} ${HOME_DIR}/.muttrc
 
-for client in ${BACKUP_CLIENT}; do
+for client in ${BACKUP_CLIENTS}; do
   echo "${client} amandabackup amindexd amidxtaped" >> ${HOME_DIR}/.amandahosts
 done
 

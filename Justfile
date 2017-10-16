@@ -38,9 +38,9 @@ function caseify()
         (justify client up -d amandad)
         (justify client logs -f)
       else
-        if command -v docker1.21 >&/dev/null && [ "$(docker1.21 info 2>/dev/null | sed -n '/^Server Version/{s/Server Version: //p;q}')" == "1.9.1" ]; then
-          export COMPOSE_API_VERSION=1.21
-          export COMPOSE_FILE="${AMANDA_CWD}/docker-compose1.yml"
+        if command -v docker1.23 >&/dev/null && [ "$(docker1.23 info 2>/dev/null | sed -n '/^Server Version/{s/Server Version: //p;q}')" == "1.11.2" ]; then
+          export COMPOSE_API_VERSION=1.23
+          #export COMPOSE_FILE="${AMANDA_CWD}/docker-compose1.yml"
         fi
         Docker-compose "${@}"
         extra_args+=$#

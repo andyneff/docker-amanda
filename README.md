@@ -14,13 +14,59 @@ vsidata is my specific configuration I use and docker compose files are specific
 to my mount locations, provided as a implementation example. This could be made
 more generic with "just"
 
+# Setup
+
+## SSH keys
+
+- SSH keys are auto generated when a container starts. (not at build time, so they
+are not in the images). You must transfer the keys between server and client.
+
+```
+# On Tape Server
+just pull-server-ssh
+
+# On Client
+just push-client-ssh
+
+# On Client
+just pull-client-ssh
+# On Tape Server
+just push-server-ssh
+```
+
+This copies the public key locally. Either copy them between the server or client,
+or use `DOCKER_HOST` to access remote docker servers from a single system.
+
+## GPG Keys
+
+Since the backup server only needs the public key (unless restoring) the easiest
+way to aquire the gpg key is to upload your public key to the keyserver, and use
+just to pull it down
+
+```
+just gpg recv 8710D02E
+just gpg list
+```
+
+# J.U.S.T.
+
+To use the just script, source the environment script and you are good to go
+
+```
+source ./setup.env
+
+# Optional
+just --help
+```
+
 # Client
 
 ```
-docker-compose up -d
+# On Client
+just client
 ```
 
-Fire this docker up and forget your backup worries.
+Fire this docker up and forget your backup worries (it auto restart).
 
 # Server
 
@@ -37,22 +83,11 @@ containers.
 You can get your configuration into the volume however you like. One such
 example is
 
-```bash
-dcp2v ()
-{
-  local volume="$1";
-  shift 1;
-  tar zc "${@}" | docker run -i --rm -v "${volume}":/cp -w /cp alpine tar zx
-}
-
-cd vsidata; dcp2v amanada_amanda-config
-```
-
 To check your configuration, run
 
-
 ```
-docker-compose -f server.yml run --rm check
+# On Tape Server
+just check
 ```
 
 At this point, you should see:
@@ -66,24 +101,28 @@ Client check: 1 host checked in 2.081 seconds.  0 problems found.
 To test an actual backup:
 
 ```
-docker-compose -f server.yml run -d --rm backup
+# On Tape Server
+just backup
 ```
 
-# Common problems
+# Restoring
 
-- ERROR: NAK, looks like
+To start a restore, start the server on the backup server
 
 ```
-Amanda Backup Client Hosts Check
---------------------------------
-ERROR: NAK 1.2.3.4: host nwstrtrj01.rd.lv.cox.cci: port 44848 not secure
+# On Tape Server
+just server
 ```
 
-The client only *needs* port [10080](https://wiki.zmanda.com/index.php/How_To:Set_Up_iptables_for_Amanda).
-However SOME times bsdauth uses another (random) port. What do I mean
-sometimes? I don't understand it, but using the exact same docker image on
-some computers works, and on others it does not. If you get this error message, the port number will change randomly
-everytime. The only solution I found was to add the hosts network to the client of issue, so
-`--network=host`/`--net=host` (depending on the version of docker you are using)
+You will need to add the private keys to decrypt the data. These instructions
+are specific to the yubikey/GPG cards
 
-Attempts to use `--with-tcpportrange` have failed
+1. Plug in your GPG card (YubiKey)
+2. Recv public key
+
+```
+gpg2 --card-status # Should import the private stubs
+```
+
+3. Now as long as the yubikey is plugged in, the private keys will be accessible
+(although locked by pin)

@@ -27,16 +27,24 @@ if [ "$(stat -c %U:%G /holding/hd1)" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; 
 fi
 
 if [ "$(stat -c %U:%G "${GNUPGHOME}")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
-  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /home/gpg
+  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/keys
 fi
-chmod 700 /home/gpg
+chmod 700 /etc/keys
 
-if [ "${1}" == "xinetd" ]; then
-  xinetd_log="/etc/amanda/${AMANDA_CONFIG}/xinetd.$(date +%Y%m%d%H%M%S)"
-  touch "${xinetd_log}"
-  chown ${BACKUP_USERNAME}:${BACKUP_GROUP} "${xinetd_log}"
-  ln -sf "${xinetd_log}" "/etc/amanda/${AMANDA_CONFIG}/xinetd"
-  exec script -c "xinetd -d -dontfork" > "${xinetd_log}"
+if ! [ -e "/etc/keys/ssh_host_rsa_key" ]; then
+  ssh-keygen -t rsa -N "" -f /etc/keys/ssh_host_rsa_key >& /dev/null
+  ssh-keygen -t ed25519 -N "" -f /etc/keys/ssh_host_ed25519_key >& /dev/null
+  ssh-keygen -t ecdsa -N "" -f /etc/keys/ssh_host_ecdsa_key >& /dev/null
+  ssh-keygen -t dsa -N "" -f /etc/keys/ssh_host_dsa_key >& /dev/null
 fi
 
-exec gosu ${BACKUP_USERNAME} "${@}"
+if ! [ -e "/etc/keys/id_rsa" ]; then
+  ssh-keygen -t rsa -N "" -f /etc/keys/id_rsa >& /dev/null
+  chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/keys/id_rsa*
+fi
+
+if [ "$1" == "sshd" ]; then
+  exec /usr/sbin/sshd -D -e
+else
+  exec gosu ${BACKUP_USERNAME} "${@}"
+fi

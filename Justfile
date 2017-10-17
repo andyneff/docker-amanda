@@ -58,7 +58,22 @@ function caseify()
     backup) # Start a backup on the server
       (justify server up -d backup)
       # (justify server logs -f backup)
-      (justify server run server tail -n +1 -f /etc/amanda/vsidata/log /etc/amanda/vsidata/amdump /etc/amanda/vsidata/xinetd)
+      (justify server run server tail -n +1 -f /etc/amanda/vsidata/log /etc/amanda/vsidata/amdump)
+      ;;
+
+    pull-server-ssh) # Pull the server ssh public key
+      (justify server run server cat /etc/keys/id_rsa.pub) > server.pub
+      ;;
+    pull-cliend-ssh) # Pull the server ssh public key
+      (justify client run amandad cat /etc/keys/id_rsa.pub) > client.pub
+      ;;
+
+
+    push-client-ssh) # Push the server ssh key to the client
+      (justify client run amandad bash -c "cat - >> /etc/keys/authorized_keys") < server.pub
+      ;;
+    push-server-ssh) # Push the server ssh key to the client
+      (justify server run server bash -c "cat - >> /etc/keys/authorized_keys") < client.pub
       ;;
 
     abort) # Abort a backup in progress

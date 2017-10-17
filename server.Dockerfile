@@ -12,12 +12,13 @@ COPY --from=amanda /amanda-backup-server*.deb /
 RUN apt-get update; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         ca-certificates mt-st mutt openssh-client gnuplot-nox libjson-perl \
-        libencode-locale-perl gettext xinetd bsd-mailx libcurl3 aespipe; \
+        libencode-locale-perl gettext openssh-server bsd-mailx libcurl3 aespipe; \
     mkdir -p /root/.gnupg/private-keys-v1.d; \
     chmod 700 /root/.gnupg/private-keys-v1.d /root/.gnupg; \
     dpkg -i /amanda-backup-server*.deb || :; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -f; \
-    rm /amanda-backup*.deb
+    rm /amanda-backup*.deb; \
+    rm /etc/ssh/ssh_host*
 
 # Install gosu
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
@@ -41,17 +42,24 @@ RUN chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda ;\
     chmod 755 /usr/local/bin/htmlmutt; \
     chmod 755 /server_entrypoint.bsh
 
+# Customize sshd
+RUN sed -i 's|HostKey /etc/ssh|HostKey /etc/keys|' /etc/ssh/sshd_config; \
+    echo AuthorizedKeysFile /etc/keys/authorized_keys >> /etc/ssh/sshd_config; \
+    echo PasswordAuthentication no >> /etc/ssh/sshd_config; \
+    echo StrictHostKeyChecking no >> /etc/ssh/ssh_config; \
+    mkdir /var/run/sshd; \
+    rm /etc/motd
+
 # Setup timezone
 ENV TZ="US/Eastern"
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-#amindexd
-EXPOSE 10082
-#amidxtaped
-EXPOSE 10083
+#sshd
+EXPOSE 22
 
 # Create internal volumes
 VOLUME /etc/amanda
-#VOLUME /var/lib/amanda
 
 ENTRYPOINT ["/usr/local/bin/tini", "--", "/server_entrypoint.bsh"]
+
+CMD ["sshd"]

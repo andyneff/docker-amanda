@@ -1,2 +1,4 @@
 local.env
 local_post.env
+server.pub
+client.pub

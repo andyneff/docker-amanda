@@ -3,16 +3,18 @@
 set -eu
 
 echo "${SERVER_NAME} ${BACKUP_USERNAME} amdump" >> /var/lib/amanda/.amandahosts
-
-echo 'conf   "vsidata"
-index_server "amanda-server"
-tape_server  "amanda-server"
-auth "bsdtcp"
-unreserved-tcp-port 10070,10072
-reserved-tcp-port 880,882
-reserved-udp-port 883,885' > /etc/amanda/amanda-client.conf
-chmod 640 /etc/amanda/amanda-client.conf
-
 chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/gnutar-lists /etc/amanda/amanda-client.conf
+
+if ! [ -e "/etc/keys/ssh_host_rsa_key" ]; then
+  ssh-keygen -t rsa -N "" -f /etc/keys/ssh_host_rsa_key >& /dev/null
+  ssh-keygen -t ed25519 -N "" -f /etc/keys/ssh_host_ed25519_key >& /dev/null
+  ssh-keygen -t ecdsa -N "" -f /etc/keys/ssh_host_ecdsa_key >& /dev/null
+  ssh-keygen -t dsa -N "" -f /etc/keys/ssh_host_dsa_key >& /dev/null
+fi
+
+if ! [ -e "/etc/keys/id_rsa" ]; then
+  ssh-keygen -t rsa -N "" -f /etc/keys/id_rsa >& /dev/null
+  chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/keys/id_rsa*
+fi
 
 exec "${@}"

@@ -39,13 +39,14 @@ or use `DOCKER_HOST` to access remote docker servers from a single system.
 
 ## GPG Keys
 
-Since the backup server only needs the public key (unless restoring) the easiest
-way to aquire the gpg key is to upload your public key to the keyserver, and use
-just to pull it down
+You need a secure password (but one that WILL be stored plain text...) store
 
 ```
-just gpg recv 8710D02E
-just gpg list
+# Optional
+just gpg-suggest-password
+# Store password somewhere offline and safe
+
+just gpg-keys
 ```
 
 # J.U.S.T.
@@ -122,6 +123,9 @@ are specific to the yubikey/GPG cards
 
 ```
 gpg2 --card-status # Should import the private stubs
+gpg2 --card-edit
+verify
+# Enter pin number This should remember for up to a month. See gpg-agent.conf if this isn't enough
 ```
 
 3. Now as long as the yubikey is plugged in, the private keys will be accessible

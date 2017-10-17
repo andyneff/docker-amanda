@@ -40,7 +40,10 @@ RUN chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda ;\
     gosu ${BACKUP_USERNAME} mkdir /etc/amanda/template.d; \
     gosu ${BACKUP_USERNAME} cp /var/lib/amanda/template.d/*types /etc/amanda/template.d; \
     chmod 755 /usr/local/bin/htmlmutt; \
-    chmod 755 /server_entrypoint.bsh
+    chmod 755 /server_entrypoint.bsh; \
+    ln -sf /etc/keys/.am_passphrase /var/lib/amanda/.am_passphrase; \
+    ln -sf /etc/amanda/persist/vsidata/am_key.gpg /var/lib/amanda/.gnupg/am_key.gpg; \
+    sed -i 's|uuencode -m -|openssl base64|' /usr/sbin/amaespipe
 
 # Customize sshd
 RUN sed -i 's|HostKey /etc/ssh|HostKey /etc/keys|' /etc/ssh/sshd_config; \

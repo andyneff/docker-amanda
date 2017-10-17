@@ -21,7 +21,7 @@ function caseify()
       Docker-compose -f recipes.yml build ${just_arg#*_}
       ;;
     recipes)
-      Docker-compose -f recipes.yml build "${@}"
+      Docker-compose -f "${AMANDA_CWD}/recipes.yml" build "${@}"
       extra_args+=$#
       ;;
     build) # Build everything
@@ -32,6 +32,9 @@ function caseify()
     push) # Push to dockerhub
       (justify client push)
       (justify server push server)
+      ;;
+    dropbox)
+      Docker-compose -f "${AMANDA_CWD}/dropbox.yml" up -d --build --force-recreate
       ;;
     client) # Run docker compose command for the client. E.g. "client run"
       if [ "$#" = "0" ]; then
@@ -56,15 +59,15 @@ function caseify()
       ;;
 
     backup) # Start a backup on the server
-      (justify server up -d backup)
+      (justify server run -d backup)
       # (justify server logs -f backup)
-      (justify server run server tail -n +1 -f /etc/amanda/vsidata/log /etc/amanda/vsidata/amdump)
+      (justify server run server tail -n +1 -f /etc/amanda/persist/vsidata/log /etc/amanda/persist/vsidata/amdump)
       ;;
 
     pull-server-ssh) # Pull the server ssh public key
       (justify server run server cat /etc/keys/id_rsa.pub) > server.pub
       ;;
-    pull-cliend-ssh) # Pull the server ssh public key
+    pull-client-ssh) # Pull the server ssh public key
       (justify client run amandad cat /etc/keys/id_rsa.pub) > client.pub
       ;;
 
@@ -78,9 +81,6 @@ function caseify()
 
     abort) # Abort a backup in progress
       (justify server exec backup amcleanup -k ${AMANDA_CONFIG_NAME})
-    #   for docker_id in $(docker-compose ps -q backup); do
-    #     docker exec ${docker_id} amcleanup -k ${AMANDA_CONFIG_NAME}
-    #   done
       ;;
 
     cleanup) # Cleanup an interrupted backup
@@ -127,18 +127,19 @@ function caseify()
       ;;
 
 
-    gpg_list) # List gpg keys
-      (justify server run server gpg2 --fingerprint --with-colons)
+    gpg-suggest-password) # Suggest a good random password
+      head -c 48 /dev/urandom | openssl base64
       ;;
-
-    gpg_recv) # Download gpg key by keyid
-      (justify server run server gpg2 --keyserver hkps.pool.sks-keyservers.net --recv-key "${1}")
-      extra_args+=1
-      ;;
-
-    gpg_trust) #Ultimately trust key. Must use entire fingerprint
-      echo "${1}:6" | (justify server run server gpg2 --import-ownertrust)
-      extra_args+=1
+    gpg-keys) # Generate new gpg encrypted keys for backup
+      (justify server run server bash -c \
+       'x=1; while [ "$x" != "$y" ]; do
+          read -rsp "Password: " x; echo
+          read -rsp "Confirm: " y; echo
+        done
+        echo -n "$x" > /etc/keys/.am_passphrase
+        head -c 3120 /dev/urandom | openssl base64 | head -n 66 | tail -n 65 | \
+          gpg2 --batch --cipher-algo aes256 --symmetric -a --passphrase-file /etc/keys/.am_passphrase > \
+          /etc/amanda/persist/vsidata/am_key.gpg')
       ;;
     *)
       defaultify "${just_arg}" ${@+"${@}"}

@@ -19,6 +19,8 @@ services:
     extra_hosts:
       - "amanda-server:${AMANDA_BACKUP_SERVER}"
     restart: always
+    logging:
+      driver: "json-file" #I think synology changes the default to db???
 
 volumes:
   amanda_tarlists:

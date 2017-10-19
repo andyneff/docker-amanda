@@ -89,7 +89,7 @@ function caseify()
 
     check) # Test amanda configuration and check which tape is inserted and if
            # it is valid, also tests clients
-      (justify server run server amcheck ${AMANDA_CONFIG_NAME})
+      (justify server run server amcheck ${AMANDA_CONFIG_NAME} --client-verbose)
       ;;
 
     list-tapes) # List tapes in the tape drive(s) for the current configuration

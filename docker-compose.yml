@@ -14,8 +14,11 @@ services:
     volumes:
       - amanda_tarlists:/var/lib/amanda/gnutar-lists
       - amanda_keys:/etc/keys
-      - /volume2/admin:/admin
-      - /volume2/fileserver:/fileserver
+      - /volume2/admin:/admin:ro
+      - /volume2/ITAR:/ITAR:ro
+      - /volume2/fileserver:/fileserver:ro
+    environment:
+      - BACKUP_UID=256822
     extra_hosts:
       - "amanda-server:${AMANDA_BACKUP_SERVER}"
     restart: always

@@ -55,7 +55,6 @@ RUN sed -i 's|HostKey /etc/ssh|HostKey /etc/keys|' /etc/ssh/sshd_config; \
 
 # Setup timezone
 ENV TZ="US/Eastern"
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 #sshd
 EXPOSE 22

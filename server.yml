@@ -26,6 +26,8 @@ services:
     ports:
       - "10070:22"
     hostname: amanda-server
+    extra_hosts:
+      - "fileserver:192.168.11.7"
 
   # Backup
   backup:

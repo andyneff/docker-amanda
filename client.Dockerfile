@@ -42,8 +42,8 @@ RUN sed -i 's|HostKey /etc/ssh|HostKey /etc/keys|' /etc/ssh/sshd_config; \
     mkdir /var/run/sshd; \
     rm /etc/motd
 
-ENV TZ="US/Eastern"
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+ENV BACKUP_UID=63998 \
+    TZ="US/Eastern"
 
 EXPOSE 22
 

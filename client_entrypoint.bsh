@@ -2,8 +2,12 @@
 
 set -eu
 
+ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+usermod -u "${BACKUP_UID}" amandabackup
+
 echo "${SERVER_NAME} ${BACKUP_USERNAME} amdump" >> /var/lib/amanda/.amandahosts
-chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/gnutar-lists /etc/amanda/amanda-client.conf
+chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/gnutar-lists /etc/amanda /etc/amandates /var/log/amanda /tmp/amanda
 
 if ! [ -e "/etc/keys/ssh_host_rsa_key" ]; then
   ssh-keygen -t rsa -N "" -f /etc/keys/ssh_host_rsa_key >& /dev/null

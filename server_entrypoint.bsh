@@ -4,6 +4,8 @@ set -eu
 
 HOME_DIR="$(eval echo ~${BACKUP_USERNAME})"
 
+ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # File already exists and owned by backup
 echo "set smtp_url=\"${SMTP_SERVER}\"" > ${HOME_DIR}/.muttrc
 echo "set from=\"${FROM_EMAIL}\"" >> ${HOME_DIR}/.muttrc

@@ -1,14 +1,14 @@
-version: '3.3'
+version: '2.3'
 
 services:
   # designed to be docker-compose run on server
   server: &server
     build:
       context: .
-      dockerfile: server.Dockerfile
+      dockerfile: docker/server.Dockerfile
       args:
         AMANDA_VERSION: "${AMANDA_VERSION}"
-    image: ${AMANDA_DOCKERHUB_REPO}:server
+    image: ${AMANDA_DOCKER_REPO}:server
     volumes:
       - /holding:/holding
       - /cache:/cache

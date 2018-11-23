@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-: "$(dirname "${BASH_SOURCE[0]}")"
-. "${_}"/external/vsi_common/linux/Just_wrap "${_}"/amanda.env ${@+"${@}"}

@@ -1,5 +1,5 @@
 FROM vsiri/recipe:tini AS tini
-FROM vsiri/recipe:amanda AS zmanda
+FROM vsiri/recipe:amanda_deb AS zmanda
 
 FROM debian:8
 LABEL maintainer="Andrew Neff <andrew.neff@visionsystemsinc.com>"
@@ -23,7 +23,7 @@ RUN echo "runtar:gnutar_path=/bin/tar" > /etc/amanda-security.conf; \
     chmod 640 /etc/amanda-security.conf
 
 # Setup Amanda
-ADD client_entrypoint.bsh /
+ADD docker/client_entrypoint.bsh /
 ADD vsidata/amanda-client.conf /etc/amanda/
 ENV SERVER_NAME=amanda-server \
     BACKUP_USERNAME=amandabackup \

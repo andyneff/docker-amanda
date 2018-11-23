@@ -1,6 +1,6 @@
 FROM vsiri/recipe:tini AS tini
 FROM vsiri/recipe:gosu AS gosu
-FROM vsiri/recipe:amanda AS amanda
+FROM vsiri/recipe:amanda_deb AS amanda
 
 FROM debian:8
 LABEL maintainer="Andrew Neff <andrew.neff@visionsystemsinc.com>"
@@ -25,8 +25,8 @@ COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini
 
 # Setup Amanda
-ADD htmlmutt /usr/local/bin/
-ADD server_entrypoint.bsh /
+ADD docker/htmlmutt /usr/local/bin/
+ADD docker/server_entrypoint.bsh /
 ADD vsidata /etc/amanda/vsidata
 ENV BACKUP_USERNAME=amandabackup \
     BACKUP_GROUP=disk \

@@ -6,7 +6,7 @@ them all together they do help a lot. But I was not able to find any "here's a
 docker, now run!" So here is my docker solution
 
 While Amanda can be run on a single computer I focused on the setup for me where
-I had a single backup "Amanda server" and come "Amanda clients". In Amanda, the
+I had a single backup "Amanda server" and some "Amanda clients". In Amanda, the
 clients actually run daemons and the server connects to the client. The clients
 become the easier part to configure.
 

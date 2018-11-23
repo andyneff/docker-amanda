@@ -1,3 +1,9 @@
-data
-etc
-.git
+*
+!docker
+!external/vsi_common
+!proj.env
+!vsidata
+
+# data
+# etc
+# .git

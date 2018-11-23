@@ -5,10 +5,10 @@ services:
   amandad:
     build:
       context: .
-      dockerfile: client.Dockerfile
+      dockerfile: docker/client.Dockerfile
       args:
         AMANDA_VERSION: "${AMANDA_VERSION}"
-    image: ${AMANDA_DOCKERHUB_REPO}:client
+    image: ${AMANDA_DOCKER_REPO}:client
     ports:
     - "10070:22"
     volumes:

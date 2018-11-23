@@ -2,3 +2,4 @@ local.env
 local_post.env
 server.pub
 client.pub
+.just_synched

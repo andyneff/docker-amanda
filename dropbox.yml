@@ -12,6 +12,8 @@ services:
     volumes:
       - dropbox:/dropbox
       - "amanda-config:/dropbox/Dropbox (VSI)/amanda_etc:ro"
+    restart: always
+
 
 volumes:
   amanda-config:

@@ -26,7 +26,7 @@ COPY --from=dropbox /dropbox /dropbox
 # Install gosu
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 
-ADD dropbox_entrypoint.bsh /
+ADD docker/dropbox_entrypoint.bsh /
 
 RUN chmod 755 /dropbox_entrypoint.bsh
 

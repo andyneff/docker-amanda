@@ -49,7 +49,15 @@ function caseify()
     backup) # Start a backup on the server
       justify server run -d backup
       # justify server logs -f backup
-      justify server run server tail -n +1 -f /etc/amanda/persist/vsidata/log /etc/amanda/persist/vsidata/amdump
+      justify server run server tail -n +1 -f "/etc/amanda/persist/${AMANDA_CONFIG_NAME}/log" "/etc/amanda/persist/${AMANDA_CONFIG_NAME}/amdump"
+      ;;
+
+    report) # Print last report
+      justify server run server amreport "${AMANDA_CONFIG_NAME}"
+      ;;
+
+    email_report) # Email last report
+      justify server run server amreport "${AMANDA_CONFIG_NAME}" -M "${AMANDA_TO_EMAIL}"
       ;;
 
     pull-server-ssh) # Pull the server ssh public key
@@ -68,24 +76,24 @@ function caseify()
       ;;
 
     abort) # Abort a backup in progress
-      justify server exec backup amcleanup -k ${AMANDA_CONFIG_NAME}
+      justify server exec backup amcleanup -k "${AMANDA_CONFIG_NAME}"
       ;;
 
     cleanup) # Cleanup an interrupted backup
-      justify server run server amcleanup ${AMANDA_CONFIG_NAME}
+      justify server run server amcleanup "${AMANDA_CONFIG_NAME}"
       ;;
 
     check) # Test amanda configuration and check which tape is inserted and if
            # it is valid, also tests clients
-      justify server run server amcheck ${AMANDA_CONFIG_NAME} --client-verbose
+      justify server run server amcheck "${AMANDA_CONFIG_NAME}" --client-verbose
       ;;
 
     list-tapes) # List tapes in the tape drive(s) for the current configuration
-      justify server run server amtape ${AMANDA_CONFIG_NAME} show
+      justify server run server amtape "${AMANDA_CONFIG_NAME}" show
       ;;
 
     current-tape) #Display current slot/tape
-      justify server run server amtape ${AMANDA_CONFIG_NAME} current
+      justify server run server amtape "${AMANDA_CONFIG_NAME}" current
       ;;
 
     rewind) # Rewind tape. This should not be part of normal operation
@@ -102,7 +110,7 @@ function caseify()
       ;;
 
     print-config) # Print configuration
-      justify server run server amadmin ${AMANDA_CONFIG_NAME} config
+      justify server run server amadmin "${AMANDA_CONFIG_NAME}" config
       ;;
 
 # #  recover:
@@ -127,7 +135,7 @@ function caseify()
         echo -n "$x" > /etc/keys/.am_passphrase
         head -c 3120 /dev/urandom | openssl base64 | head -n 66 | tail -n 65 | \
           gpg2 --batch --cipher-algo aes256 --symmetric -a --passphrase-file /etc/keys/.am_passphrase > \
-          /etc/amanda/persist/vsidata/am_key.gpg'
+          /etc/amanda/persist/'"${AMANDA_CONFIG_NAME}"'/am_key.gpg'
       ;;
     *)
       defaultify "${just_arg}" ${@+"${@}"}

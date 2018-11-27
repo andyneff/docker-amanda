@@ -7,21 +7,21 @@ HOME_DIR="$(eval echo ~${BACKUP_USERNAME})"
 ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # File already exists and owned by backup
-echo "set smtp_url=\"${SMTP_SERVER}\"" > ${HOME_DIR}/.muttrc
-echo "set from=\"${FROM_EMAIL}\"" >> ${HOME_DIR}/.muttrc
-echo "set realname = \"Amanda Backup\"" >> ${HOME_DIR}/.muttrc
+echo "set smtp_url=\"${SMTP_SERVER}\"" > "${HOME_DIR}/.muttrc"
+echo "set from=\"${FROM_EMAIL}\"" >> "${HOME_DIR}/.muttrc"
+echo "set realname = \"Amanda Backup\"" >> "${HOME_DIR}/.muttrc"
 
-chown ${BACKUP_USERNAME}:${BACKUP_GROUP} ${HOME_DIR}/.muttrc
+chown "${BACKUP_USERNAME}:${BACKUP_GROUP}" "${HOME_DIR}/.muttrc"
 
 for client in ${BACKUP_CLIENTS}; do
-  echo "${client} amandabackup amindexd amidxtaped" >> ${HOME_DIR}/.amandahosts
+  echo "${client} amandabackup amindexd amidxtaped" >> "${HOME_DIR}/.amandahosts"
 done
 
 sed -i 's|^mailto .*|mailto "'"${TO_EMAIL}"'"|' /etc/amanda/${AMANDA_CONFIG}/amanda.conf
 sed -i 's|^.*property "mailto" .*|  property "mailto" "'"${TO_EMAIL}"'"|' /etc/amanda/${AMANDA_CONFIG}/amanda.conf
 
-if [ "$(stat -c %U:%G /etc/amanda/vsidata)" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
-  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda/vsidata
+if [ "$(stat -c %U:%G "/etc/amanda/${AMANDA_CONFIG}")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
+  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} "/etc/amanda/${AMANDA_CONFIG}"
 fi
 
 if [ "$(stat -c %U:%G /holding/hd1)" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then

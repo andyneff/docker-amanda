@@ -1,7 +1,7 @@
 org "Vision Systems, Inc Backup"		# your organization name for reports
 dumpuser "amandabackup"	# the user to run dumps under
 mailer "/usr/local/bin/htmlmutt" # HTML enabled mailer
-mailto "backup@example.com"	# space separated list of operators at your site
+mailto "${TO_EMAIL}"	# space separated list of operators at your site
 dumpcycle 10weeks		# the number of days in the normal dump cycle
 runspercycle 10		# the number of amdump runs in dumpcycle days
 tapecycle 20	# the number of tapes in rotation
@@ -16,7 +16,7 @@ eject-volume yes
 define interactivity "email-change" {
   comment "Send email to have tapes swapped"
   plugin "email"
-  property "mailto" "backup@example.com"
+  property "mailto" "${TO_EMAIL}"
   property "resend-delay" "43200"
   property "check-file" "/tmp/amanda_load"
 }

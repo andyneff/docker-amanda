@@ -17,17 +17,17 @@ services:
     devices:
       - "${AMANDA_TAPE_DRIVE}:${AMANDA_TAPE_DRIVE}"
     environment:
-      - AMANDA_CONFIG=${AMANDA_CONFIG_NAME}
+      - AMANDA_CONFIG_NAME=${AMANDA_CONFIG_NAME}
       - FROM_EMAIL=${AMANDA_FROM_EMAIL}
       - TO_EMAIL=${AMANDA_TO_EMAIL}
       - SMTP_SERVER=${AMANDA_SMTP_SERVER}
       - BACKUP_CLIENTS=${AMANDA_BACKUP_CLIENTS}
       - GNUPGHOME=/etc/keys
     ports:
-      - "10070:22"
+      - "${AMANDA_SERVER_SSH_IP}:${AMANDA_SERVER_SSH_PORT}:22"
     hostname: amanda-server
     extra_hosts:
-      - "fileserver:192.168.11.7"
+      - "fileserver:${AMANDA_BACKUP_CLIENTS}"
 
   # Backup
   backup:

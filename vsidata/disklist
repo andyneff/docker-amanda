@@ -9,105 +9,105 @@ fileserver /ITAR server-compress-encrypt-user-tar-span 2
 ## Fileserver ##
 # Personal #
 
-fileserver /fileserver/personal/./__big_offenders__ /fileserver/personal {
-  server-compress-encrypt-user-tar-span
-  include "./ozge"
-  include "./vj"
-  include "./hasnain"
-} 2
+# fileserver /fileserver/personal/./__big_offenders__ /fileserver/personal {
+#   server-compress-encrypt-user-tar-span
+#   include "./ozge"
+#   include "./vj"
+#   include "./hasnain"
+# } 2
 
-fileserver /fileserver/personal/./__rest__ /fileserver/personal {
-  server-compress-encrypt-user-tar-span
-  exclude append "./ozge"
-  exclude append "./vj"
-  exclude append "./hasnain"
-} 2
+# fileserver /fileserver/personal/./__rest__ /fileserver/personal {
+#   server-compress-encrypt-user-tar-span
+#   exclude append "./ozge"
+#   exclude append "./vj"
+#   exclude append "./hasnain"
+# } 2
 
-## Fileserver ##
-# data #
+# ## Fileserver ##
+# # data #
 
-fileserver /fileserver/data/./dem /fileserver/data {
-  server-compress-encrypt-user-tar-span
-  include "./dem"
-} 2
+# fileserver /fileserver/data/./dem /fileserver/data {
+#   server-compress-encrypt-user-tar-span
+#   include "./dem"
+# } 2
 
-fileserver /fileserver/data/./CLIF2007 /fileserver/data {
-  server-compress-encrypt-user-tar-span
-  include "./CLIF2007"
-} 2
+# fileserver /fileserver/data/./CLIF2007 /fileserver/data {
+#   server-compress-encrypt-user-tar-span
+#   include "./CLIF2007"
+# } 2
 
-fileserver /fileserver/data/./CORE3D /fileserver/data {
-  server-compress-encrypt-user-tar-span
-  include "./CORE3D"
-} 2
+# fileserver /fileserver/data/./CORE3D /fileserver/data {
+#   server-compress-encrypt-user-tar-span
+#   include "./CORE3D"
+# } 2
 
-fileserver /fileserver/data/./Kandahar-Sat /fileserver/data {
-  server-compress-encrypt-user-tar-span
-  include "./Kandahar-Sat"
-} 2
+# fileserver /fileserver/data/./Kandahar-Sat /fileserver/data {
+#   server-compress-encrypt-user-tar-span
+#   include "./Kandahar-Sat"
+# } 2
 
-fileserver /fileserver/data/./RI_LIDAR_spring_2011 /fileserver/data {
-  server-compress-encrypt-user-tar-span
-  include "./RI_LIDAR_spring_2011"
-} 2
+# fileserver /fileserver/data/./RI_LIDAR_spring_2011 /fileserver/data {
+#   server-compress-encrypt-user-tar-span
+#   include "./RI_LIDAR_spring_2011"
+# } 2
 
-fileserver /fileserver/data/./SatTel /fileserver/data {
-  server-compress-encrypt-user-tar-span
-  include "./SatTel"
-} 2
+# fileserver /fileserver/data/./SatTel /fileserver/data {
+#   server-compress-encrypt-user-tar-span
+#   include "./SatTel"
+# } 2
 
-fileserver /fileserver/data/./mamiLarge /fileserver/data {
-  server-compress-encrypt-user-tar-span
-  include "./mamiLarge"
-} 2
+# fileserver /fileserver/data/./mamiLarge /fileserver/data {
+#   server-compress-encrypt-user-tar-span
+#   include "./mamiLarge"
+# } 2
 
-fileserver /fileserver/data/./providence_Jan8_2016 /fileserver/data {
-  server-compress-encrypt-user-tar-span
-  include "./providence_Jan8_2016"
-} 2
+# fileserver /fileserver/data/./providence_Jan8_2016 /fileserver/data {
+#   server-compress-encrypt-user-tar-span
+#   include "./providence_Jan8_2016"
+# } 2
 
-fileserver /fileserver/data/./__rest__ /fileserver/data {
-  server-compress-encrypt-user-tar-span
-  exclude append "./dem"
-  exclude append "./CLIF2007"
-  exclude append "./CORE3D"
-  exclude append "./Kandahar-Sat"
-  exclude append "./RI_LIDAR_spring_2011"
-  exclude append "./SatTel"
-  exclude append "./mamiLarge"
-  exclude append "./providence_Jan8_2016"
-} 2
+# fileserver /fileserver/data/./__rest__ /fileserver/data {
+#   server-compress-encrypt-user-tar-span
+#   exclude append "./dem"
+#   exclude append "./CLIF2007"
+#   exclude append "./CORE3D"
+#   exclude append "./Kandahar-Sat"
+#   exclude append "./RI_LIDAR_spring_2011"
+#   exclude append "./SatTel"
+#   exclude append "./mamiLarge"
+#   exclude append "./providence_Jan8_2016"
+# } 2
 
-## Fileserver ##
-# projects #
+# ## Fileserver ##
+# # projects #
 
-fileserver /fileserver/projects/./4D-Seedling /fileserver/projects {
-  server-compress-encrypt-user-tar-span
-  include "./4D-Seedling"
-} 2
+# fileserver /fileserver/projects/./4D-Seedling /fileserver/projects {
+#   server-compress-encrypt-user-tar-span
+#   include "./4D-Seedling"
+# } 2
 
-fileserver /fileserver/projects/./FINDER /fileserver/projects {
-  server-compress-encrypt-user-tar-span
-  include "./FINDER"
-} 2
+# fileserver /fileserver/projects/./FINDER /fileserver/projects {
+#   server-compress-encrypt-user-tar-span
+#   include "./FINDER"
+# } 2
 
-fileserver /fileserver/projects/./Janus /fileserver/projects {
-  server-compress-encrypt-user-tar-span
-  include "./Janus"
-} 2
+# fileserver /fileserver/projects/./Janus /fileserver/projects {
+#   server-compress-encrypt-user-tar-span
+#   include "./Janus"
+# } 2
 
-fileserver /fileserver/projects/./NGA_P2 /fileserver/projects {
-  server-compress-encrypt-user-tar-span
-  include "./NGA_P2"
-} 2
+# fileserver /fileserver/projects/./NGA_P2 /fileserver/projects {
+#   server-compress-encrypt-user-tar-span
+#   include "./NGA_P2"
+# } 2
 
-fileserver /fileserver/projects/./__rest__ /fileserver/projects {
-  server-compress-encrypt-user-tar-span
-  exclude append "./4D-Seedling"
-  exclude append "./FINDER"
-  exclude append "./Janus"
-  exclude append "./NGA_P2"
-} 2
+# fileserver /fileserver/projects/./__rest__ /fileserver/projects {
+#   server-compress-encrypt-user-tar-span
+#   exclude append "./4D-Seedling"
+#   exclude append "./FINDER"
+#   exclude append "./Janus"
+#   exclude append "./NGA_P2"
+# } 2
 
 ## Fileserver ##
 # Everything else #

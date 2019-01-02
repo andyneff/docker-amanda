@@ -1,0 +1,3 @@
+set smtp_url="${SMTP_SERVER}"
+set from="${FROM_EMAIL}"
+set realname = "Amanda Backup"

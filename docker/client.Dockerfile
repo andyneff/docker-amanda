@@ -1,5 +1,6 @@
 FROM vsiri/recipe:tini AS tini
 FROM vsiri/recipe:amanda_deb AS zmanda
+FROM vsiri/recipe:ep AS ep
 
 FROM debian:8
 LABEL maintainer="Andrew Neff <andrew.neff@visionsystemsinc.com>"

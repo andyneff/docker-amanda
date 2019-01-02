@@ -13,7 +13,7 @@ function caseify()
   shift 1
   case ${just_arg} in
     build) # Build everything
-      justify build_recipes gosu tini vsi amanda_deb
+      justify build_recipes gosu tini vsi amanda_deb ep
       justify client build
       justify server build server
       ;;
@@ -49,6 +49,10 @@ function caseify()
     backup) # Start a backup on the server
       justify server run -d backup
       # justify server logs -f backup
+      justify backup logs
+      ;;
+
+    backup_logs) # Show the backup logs
       justify server run server tail -n +1 -f "/etc/amanda/persist/${AMANDA_CONFIG_NAME}/log" "/etc/amanda/persist/${AMANDA_CONFIG_NAME}/amdump"
       ;;
 

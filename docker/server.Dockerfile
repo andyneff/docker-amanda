@@ -1,5 +1,6 @@
 FROM vsiri/recipe:tini AS tini
 FROM vsiri/recipe:gosu AS gosu
+FROM vsiri/recipe:ep AS ep
 FROM vsiri/recipe:amanda_deb AS amanda
 
 FROM debian:8
@@ -20,12 +21,14 @@ RUN apt-get update; \
     rm /amanda-backup*.deb; \
     rm /etc/ssh/ssh_host*
 
-# Install gosu
+# Install recipes
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
 COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini
+COPY --from=ep /usr/local/bin/ep /usr/local/bin/ep
 
 # Setup Amanda
 ADD docker/htmlmutt /usr/local/bin/
+ADD docker/muttrc /etc/
 ADD docker/server_entrypoint.bsh /
 ADD vsidata /etc/amanda/vsidata
 ENV BACKUP_USERNAME=amandabackup \
@@ -62,6 +65,6 @@ EXPOSE 22
 # Create internal volumes
 VOLUME /etc/amanda
 
-ENTRYPOINT ["/usr/local/bin/tini", "--", "/server_entrypoint.bsh"]
+ENTRYPOINT ["/usr/local/bin/tini", "--", "/usr/bin/env", "bash", "/server_entrypoint.bsh"]
 
 CMD ["sshd"]

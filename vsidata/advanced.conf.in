@@ -70,7 +70,7 @@ amrecover_changer "changer"	# amrecover will use the changer if you restore
 # This means save at least 30% of the holding disk space for degraded
 # mode backups.
 
-autoflush no
+autoflush yes
 # if autoflush is set to yes, then amdump will schedule all dump on
 # holding disks to be flush to tape during the run.
 
@@ -84,12 +84,12 @@ autoflush no
 # Note that, although the keyword below is infofile, it is only so for
 # historic reasons, since now it is supposed to be a directory (unless
 # you have selected some database format other than the `text' default)
-infofile "/etc/amanda/persist/vsidata/curinfo"      # database DIRECTORY
-logdir   "/etc/amanda/persist/vsidata"              # log directory
-indexdir "/etc/amanda/persist/vsidata/index"        # index directory
-command-file "/etc/amanda/persist/vsidata/command_file"
-tapelist "/etc/amanda/persist/vsidata/tapelist"
-#tapelist "@CONFIG_DIR/vsidata/tapelist"	# list of used tapes
+infofile "/etc/amanda/persist/${AMANDA_CONFIG_NAME}/curinfo"      # database DIRECTORY
+logdir   "/etc/amanda/persist/${AMANDA_CONFIG_NAME}"              # log directory
+indexdir "/etc/amanda/persist/${AMANDA_CONFIG_NAME}/index"        # index directory
+command-file "/etc/amanda/persist/${AMANDA_CONFIG_NAME}/command_file"
+tapelist "/etc/amanda/persist/${AMANDA_CONFIG_NAME}/tapelist"
+#tapelist "@CONFIG_DIR/${AMANDA_CONFIG_NAME}/tapelist"	# list of used tapes
 # tapelist is stored, by default, in the directory that contains amanda.conf
 
 # Specify holding disks.  These are used as a temporary staging area for

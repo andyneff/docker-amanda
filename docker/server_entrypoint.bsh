@@ -6,6 +6,10 @@ HOME_DIR="$(eval echo ~${BACKUP_USERNAME})"
 
 ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+# incase it doesn't already exist
+groupadd -g "${AMANDA_GID}" -o tape2 || :
+usermod -a -G tape2 ${BACKUP_USERNAME}
+
 for client in ${BACKUP_CLIENTS}; do
   echo "${client} amandabackup amindexd amidxtaped" >> "${HOME_DIR}/.amandahosts"
 done

@@ -23,6 +23,7 @@ services:
       - SMTP_SERVER=${AMANDA_SMTP_SERVER}
       - BACKUP_CLIENTS=${AMANDA_BACKUP_CLIENTS}
       - GNUPGHOME=/etc/keys
+      - AMANDA_GID=${AMANDA_TAPE_GID}
     ports:
       - "${AMANDA_SERVER_SSH_IP}:${AMANDA_SERVER_SSH_PORT}:22"
     hostname: amanda-server

@@ -27,6 +27,10 @@ if [ "$(stat -c %U:%G "/etc/amanda/${AMANDA_CONFIG_NAME}")" != "${BACKUP_USERNAM
   chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} "/etc/amanda/${AMANDA_CONFIG_NAME}"
 fi
 
+if [ "$(stat -c %U:%G "/etc/amanda/persisit/${AMANDA_CONFIG_NAME}")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
+  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} "/etc/amanda/persisit/${AMANDA_CONFIG_NAME}"
+fi
+
 if [ "$(stat -c %U:%G /holding/hd1)" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
   chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /holding/hd1
 fi

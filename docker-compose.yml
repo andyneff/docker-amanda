@@ -19,6 +19,8 @@ services:
       - /volume2/fileserver:/fileserver:ro
     environment:
       - BACKUP_UID=256822
+      - AMANDA_CONFIG_NAME=${AMANDA_CONFIG_NAME}
+      - TO_EMAIL=${AMANDA_TO_EMAIL}
     extra_hosts:
       - "amanda-server:${AMANDA_BACKUP_SERVER}"
     restart: always

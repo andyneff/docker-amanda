@@ -67,20 +67,24 @@ function caseify()
     pull-server-ssh) # Pull the server ssh public key
       justify server run server cat /etc/keys/id_rsa.pub > server.pub
       ;;
-    pull-client-ssh) # Pull the server ssh public key
+    pull-client-ssh) # Pull the client ssh public key
       justify client run amandad cat /etc/keys/id_rsa.pub > client.pub
       ;;
 
 
     push-client-ssh) # Push the server ssh key to the client
-      justify client run amandad bash -c "cat - >> /etc/keys/authorized_keys" < server.pub
+      justify client run amandad bash -c "cat - >> /etc/keys/authorized_keys" < "${AMANDA_CWD}/server.pub"
       ;;
-    push-server-ssh) # Push the server ssh key to the client
-      justify server run server bash -c "cat - >> /etc/keys/authorized_keys" < client.pub
+    push-server-ssh) # Push the client ssh key to the server
+      # Disable the entrypoint because
+      # 1) I don't really need it
+      # 2) I need to run as root. Both stdin and authorized_keys are root only
+      justify server run --entrypoint= server bash -c "cat - >> /etc/keys/authorized_keys" < "${AMANDA_CWD}/client.pub"
       ;;
 
     abort) # Abort a backup in progress
-      justify server exec backup amcleanup -k "${AMANDA_CONFIG_NAME}"
+      local DOCKER_EXTRA_EXEC_ARGS=(-u amandabackup -it)
+      COMPOSE_FILE="${AMANDA_CWD}/server.yml" COMPOSE_SERVICES="backup" justify docker-compose enter amcleanup -k "${AMANDA_CONFIG_NAME}"
       ;;
 
     cleanup) # Cleanup an interrupted backup
@@ -101,16 +105,16 @@ function caseify()
       ;;
 
     rewind) # Rewind tape. This should not be part of normal operation
-      justify server run server mt -f /dev/nst0 rewind
+      justify server run server mt -f ${AMANDA_TAPE_DRIVE} rewind
       ;;
 
     eject) # Eject current tape
-      justify server run server mt-st -f /dev/nst0 eject
+      justify server run server mt-st -f ${AMANDA_TAPE_DRIVE} eject
       ;;
 
 
     dump-backup) #Use in conjunction with | tar tv, or | tar xv
-      justify server run server amrecover /dev/nst0 -
+      justify server run server amrecover ${AMANDA_TAPE_DRIVE} -
       ;;
 
     print-config) # Print configuration

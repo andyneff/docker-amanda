@@ -27,8 +27,8 @@ if [ "$(stat -c %U:%G "/etc/amanda/${AMANDA_CONFIG_NAME}")" != "${BACKUP_USERNAM
   chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} "/etc/amanda/${AMANDA_CONFIG_NAME}"
 fi
 
-if [ "$(stat -c %U:%G "/etc/amanda/persisit/${AMANDA_CONFIG_NAME}")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
-  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} "/etc/amanda/persisit/${AMANDA_CONFIG_NAME}"
+if [ "$(stat -c %U:%G "/etc/amanda/persist/${AMANDA_CONFIG_NAME}")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
+  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} "/etc/amanda/persist/${AMANDA_CONFIG_NAME}"
 fi
 
 if [ "$(stat -c %U:%G /holding/hd1)" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
@@ -39,6 +39,20 @@ if [ "$(stat -c %U:%G "${GNUPGHOME}")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]
   chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/keys
 fi
 chmod 700 /etc/keys
+
+if [ "$(stat -c %U:%G "/var/amanda")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
+  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/amanda
+fi
+
+if [ "$(stat -c %U:%G "/var/log/amanda")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
+  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/log/amanda
+fi
+
+if [ "$(stat -c %U:%G "/tmp/amanda")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
+  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /tmp/amanda
+fi
+
+
 
 if ! [ -e "/etc/keys/ssh_host_rsa_key" ]; then
   ssh-keygen -t rsa -N "" -f /etc/keys/ssh_host_rsa_key >& /dev/null
@@ -52,6 +66,7 @@ if ! [ -e "/etc/keys/id_rsa" ]; then
   chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/keys/id_rsa*
 fi
 
+ep -d "/etc/amanda/${AMANDA_CONFIG_NAME}/disklist.in" > "/etc/amanda/${AMANDA_CONFIG_NAME}/disklist" 2>/dev/null
 ssh fileserver -i /etc/keys/id_rsa -p 10070 find /fileserver/projects /fileserver/data /fileserver/personal -maxdepth 1 -mindepth 1 -type d -not -name @eaDir -not -name .DS_Store -print0 2>/dev/null | while IFS= read -r -d '' dir_name; do
   echo "fileserver ${dir_name} server-compress-encrypt-user-tar-span 2" >> "/etc/amanda/${AMANDA_CONFIG_NAME}/disklist"
 done

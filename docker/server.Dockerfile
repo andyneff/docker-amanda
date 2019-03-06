@@ -13,7 +13,8 @@ COPY --from=amanda /amanda-backup-server*.deb /
 RUN apt-get update; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         ca-certificates mt-st mutt openssh-client gnuplot-nox libjson-perl \
-        libencode-locale-perl gettext openssh-server bsd-mailx libcurl3 aespipe; \
+        libencode-locale-perl gettext openssh-server bsd-mailx libcurl3 aespipe\
+        libdata-dumper-simple-perl libxml-simple-perl; \
     mkdir -p /root/.gnupg/private-keys-v1.d; \
     chmod 700 /root/.gnupg/private-keys-v1.d /root/.gnupg; \
     dpkg -i /amanda-backup-server*.deb || :; \
@@ -49,7 +50,7 @@ RUN chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda ;\
     sed -i 's|uuencode -m -|openssl base64|' /usr/sbin/amaespipe
 
 # Customize sshd
-RUN sed -i 's|HostKey /etc/ssh|HostKey /etc/keys|' /etc/ssh/sshd_config; \
+RUN sed -i 's|HostKey /etc/ssh|HostKey /etc/keys|; s|StrictModes yes|StrictModes no|' /etc/ssh/sshd_config; \
     echo AuthorizedKeysFile /etc/keys/authorized_keys >> /etc/ssh/sshd_config; \
     echo PasswordAuthentication no >> /etc/ssh/sshd_config; \
     echo StrictHostKeyChecking no >> /etc/ssh/ssh_config; \

@@ -1,6 +1,5 @@
 FROM vsiri/recipe:tini AS tini
 FROM vsiri/recipe:amanda_deb AS zmanda
-FROM vsiri/recipe:ep AS ep
 
 FROM debian:8
 LABEL maintainer="Andrew Neff <andrew.neff@visionsystemsinc.com>"
@@ -11,12 +10,15 @@ SHELL ["bash", "-euxvc"]
 COPY --from=zmanda /amanda-backup-client*.deb /
 RUN apt-get update; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        ca-certificates openssh-server; \
+        ca-certificates openssh-server \
+        libxml-simple-perl libjson-perl liburi-escape-xs-perl \
+        libdata-dumper-simple-perl libencode-locale-perl; \
     dpkg -i /amanda-backup-client*.deb || :; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -f; \
     rm /amanda-backup*.deb; \
     rm /etc/ssh/ssh_host*
 
+# Install recipes
 COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini
 
 RUN echo "runtar:gnutar_path=/bin/tar" > /etc/amanda-security.conf; \
@@ -40,6 +42,10 @@ RUN sed -i 's|HostKey /etc/ssh|HostKey /etc/keys|' /etc/ssh/sshd_config; \
     echo AuthorizedKeysFile /etc/keys/authorized_keys >> /etc/ssh/sshd_config; \
     echo PasswordAuthentication no >> /etc/ssh/sshd_config; \
     echo StrictHostKeyChecking no >> /etc/ssh/ssh_config; \
+    mkdir /root/.ssh; \
+    chmod 700 /root/.ssh; \
+    echo "Host *" > /root/.ssh/config; \
+    echo "  IdentityFile /etc/keys/id_rsa" >> /root/.ssh/config; \
     mkdir /var/run/sshd; \
     rm /etc/motd
 

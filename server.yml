@@ -14,9 +14,13 @@ services:
       - /cache:/cache
       - amanda-config:/etc/amanda/persist/${AMANDA_CONFIG_NAME}
       - amanda-keys:/etc/keys
+      - amanda-logs:/var/log/amanda
+      - amanda-var:/var/amanda
+      - amanda-tmp:/tmp/amanda
     devices:
       - "${AMANDA_TAPE_DRIVE}:${AMANDA_TAPE_DRIVE}"
     environment:
+      - AMANDA_TAPE_DRIVE_NAME=${AMANDA_TAPE_DRIVE_NAME}
       - AMANDA_CONFIG_NAME=${AMANDA_CONFIG_NAME}
       - FROM_EMAIL=${AMANDA_FROM_EMAIL}
       - TO_EMAIL=${AMANDA_TO_EMAIL}
@@ -57,15 +61,15 @@ services:
   # Tape maintenance
   rewind:
     <<: *server
-    command: ["mt", "-f", "/dev/nst0", "rewind"]
+    command: ["mt", "-f", "${AMANDA_TAPE_DRIVE}", "rewind"]
   eject:
     <<: *server
-    command: ["mt-st", "-f", "/dev/nst0", "eject"]
+    command: ["mt-st", "-f", "${AMANDA_TAPE_DRIVE}", "eject"]
 
   # Misc
   dump-backup: #Use in conjunction with | tar tv, or | tar xv
     <<: *server
-    command: ["amrecover", "/dev/nst0", "-"]
+    command: ["amrecover", "${AMANDA_TAPE_DRIVE}", "-"]
   print-config:
     <<: *server
     command: ["amadmin", "${AMANDA_CONFIG_NAME}", "config"]
@@ -76,3 +80,6 @@ services:
 volumes:
   amanda-config:
   amanda-keys:
+  amanda-logs:
+  amanda-var:
+  amanda-tmp:

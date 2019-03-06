@@ -8,7 +8,7 @@ tapecycle 20	# the number of tapes in rotation
 runtapes 5		# number of tapes to be used in a single run of amdump
 
 define changer hpdrive {
-  tpchanger "chg-single:/dev/nst0"
+  tpchanger "chg-single:${AMANDA_TAPE_DRIVE_NAME}"
 }
 tpchanger "hpdrive"
 eject-volume yes
@@ -34,12 +34,6 @@ dtimeout 3600 # number of idle seconds before a dump is aborted
 ctimeout 15 # max number of secconds amcheck waits for each client
 etimeout 3600 # number of seconds per DLE for estimates
 #http://www.backupcentral.com/forum/14/234484/dump_failed_planner__error
-
-# Estimate takes too long (permanently hard coded to 6 hours in c code), so
-# use server (stats) if possible, else use calcsize
-estimate server calcsize
-#https://marc.info/?l=amanda-hackers&m=141702638517347&w=2
-
 
 define dumptype global {
        comment "Global definitions"
@@ -78,4 +72,9 @@ define dumptype server-compress-encrypt-user-tar-span {
     encrypt server
     server_encrypt "/usr/sbin/amcrypt"
     server_decrypt_option "-d"
+    # Estimate takes too long (permanently hard coded to 6 hours in c code), so
+    # use server (stats) if possible, else use calcsize
+    estimate server calcsize
+    #https://marc.info/?l=amanda-hackers&m=141702638517347&w=2
+    exclude "@eaDir"
 }

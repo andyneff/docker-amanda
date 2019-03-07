@@ -6,6 +6,17 @@ vsidata is my specific configuration I use and docker compose files are specific
 to my mount locations, provided as a implementation example. This could be made
 more generic with "just"
 
+# J.U.S.T.
+
+To use the just script, source the environment script and you are good to go
+
+```
+source ./setup.env
+
+# Optional
+just --help
+```
+
 # Deployment Environment
 
 Since we are dealing with multiple computers, and moving files between them, I find it easier to remotely connect to multiple computers using `de_activate` found [here](https://gist.github.com/andyneff/26830a64793ea18f6363e5578dc5664f)
@@ -62,6 +73,21 @@ AMANDA_CONFIG_NAME=vsidata
 
 Any other value in `amanda.env` can be overwritten here, but those are the basics.
 
+# Client
+
+Build client images
+
+```
+# On Client
+just build client
+```
+
+Fire this docker up and forget your backup worries (it auto restart).
+
+```bash
+just client
+```
+
 ## Server
 
 Build the server images
@@ -70,7 +96,7 @@ Build the server images
 just build server
 ```
 
-Start the server
+Start the server daemon (needed for when you use `amrestore`)
 
 ```bash
 just server
@@ -155,32 +181,6 @@ just gpg-suggest-password
 just gpg-keys
 ```
 
-# J.U.S.T.
-
-To use the just script, source the environment script and you are good to go
-
-```
-source ./setup.env
-
-# Optional
-just --help
-```
-
-# Client
-
-Build client images
-
-```
-# On Client
-just build client
-```
-
-Fire this docker up and forget your backup worries (it auto restart).
-
-```bash
-just client
-```
-
 # Server
 
 The server is different. Instead of running a daemon, every command has to be
@@ -245,9 +245,9 @@ just server
 
 1. `just dropbox status` shows
 
-     Syncing 28 files
-     Downloading 28 files...
-     Can't sync "amdump" (your file system is read-only)
+       Syncing 28 files
+       Downloading 28 files...
+       Can't sync "amdump" (your file system is read-only)
 
   - While this shouldn't happen, it can apparently. The files need to be deleted from dropbox (via the website) and refreshed on the server
     1. Move the files to a temp dir

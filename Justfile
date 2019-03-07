@@ -17,12 +17,23 @@ function caseify()
       justify client build
       justify server build server
       ;;
+    build_client) # Build the client
+      justify build_recipes tini amanda_deb
+      justify client build
+      ;;
+    build_server) # Build the server
+      justify build_recipes gosu tini vsi amanda_deb ep
+      justify server build server
+      ;;
     push) # Push to dockerhub
       justify client push
       justify server push server
       ;;
-    dropbox)
+    dropbox) # Start dropbox daemon
       Docker-compose -f "${AMANDA_CWD}/dropbox.yml" up -d --build --force-recreate
+      ;;
+    dropbox_status) # Get dropbox daemon status
+      Docker-compose -f "${AMANDA_CWD}/dropbox.yml" exec dropbox gosu dropbox /dropbox/dropbox.py status
       ;;
     client) # Run docker compose command for the client. E.g. "client run"
       if [ "$#" = "0" ]; then
@@ -121,9 +132,9 @@ function caseify()
       justify server run server amadmin "${AMANDA_CONFIG_NAME}" config
       ;;
 
-# #  recover:
-# #    image: vsiri/amanda:client
-# #    command: ["amrecover", "${AMANDA_CONFIG_NAME}", "-s", "jacquard"]
+    recover) # Start interactive recover
+      justify client run amandad amrecover "${AMANDA_CONFIG_NAME}"
+      ;;
 
     upload) # Upload amanda configuration to connected docker server
       cd "${AMANDA_CWD}/${AMANDA_CONFIG_NAME}"
@@ -137,13 +148,23 @@ function caseify()
     gpg-keys) # Generate new gpg encrypted keys for backup
       justify server run server bash -c '
         x=1; while [ "$x" != "$y" ]; do
-          read -rsp "Password: " x; echo
+          read -rsp "Passphrase: " x; echo
           read -rsp "Confirm: " y; echo
         done
         echo -n "$x" > /etc/keys/.am_passphrase
+        chmod 400 /etc/keys/.am_passphrase
         head -c 3120 /dev/urandom | openssl base64 | head -n 66 | tail -n 65 | \
           gpg2 --batch --cipher-algo aes256 --symmetric -a --passphrase-file /etc/keys/.am_passphrase > \
           /etc/amanda/persist/'"${AMANDA_CONFIG_NAME}"'/am_key.gpg'
+      ;;
+    set-gpg-passphrase) # Set gpg passphrase for when restoring from dropbox backup
+      justify server run server bash -c '
+        read -rsp "Passphrase: " x; echo
+        cat - > /etc/keys/.am_passphrase <<< "${x}"
+        chmod 400 /etc/keys/.am_passphrase'
+      ;;
+    recover) # Start amrecover
+      justify client run amandad amrecover "${AMANDA_CONFIG_NAME}"
       ;;
     *)
       defaultify "${just_arg}" ${@+"${@}"}

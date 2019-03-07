@@ -37,7 +37,8 @@ ENV BACKUP_USERNAME=amandabackup \
     BACKUP_CLIENTS=amanda-client \
     SMTP_SERVER="smtp://smarthost.example.com" \
     FROM_EMAIL="backup@example.com"
-RUN chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda ;\
+RUN mkdir /etc/amanda/persist; \
+    chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda ;\
     chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/.gnupg/secring.gpg ;\
     chmod 755 /etc/amanda/vsidata; \
     chmod 600 /etc/amanda/vsidata/*; \

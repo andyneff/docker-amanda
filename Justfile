@@ -71,6 +71,13 @@ function caseify()
       justify server run server amreport "${AMANDA_CONFIG_NAME}"
       ;;
 
+    status) # Get some useful status info on a running backup
+      local DOCKER_EXTRA_EXEC_ARGS=(-u amandabackup)
+      COMPOSE_FILE="${AMANDA_CWD}/server.yml" COMPOSE_SERVICES="backup" justify docker-compose enter bash -c \
+      'printf "$(grep -Ei '"'"'^pondering|^  curr level'"'"' /etc/amanda/persist/vsidata/amdump | sed -E '"'"'N;s|^(.*)\n(  curr level )([0-9])( nsize )([0-9]*)(.*)|\3 \5 \1\\n\2\3\4\5\6|;p'"'"' | sort -u | sort -gk1,1 -gk2,2nr | sed '"'"'s|^[0-9]* [0-9]* ||'"'"')" | grep --color=always -E '"'"'^|/[^/]*\.\.\.|[0-9]* csize'"'"'
+      amanda_run="$(readlink /etc/amanda/persist/vsidata/amdump)"
+       ls -larot /holding/hd1/${amanda_run#*amdump.}'
+      ;;
     email_report) # Email last report
       justify server run server amreport "${AMANDA_CONFIG_NAME}" -M "${AMANDA_TO_EMAIL}"
       ;;

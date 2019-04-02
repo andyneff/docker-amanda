@@ -1,4 +1,4 @@
-version: '2.0'
+version: '2.3'
 
 services:
   # Designed to be docker-compose up on client
@@ -26,6 +26,8 @@ services:
     restart: always
     logging:
       driver: "json-file" #I think synology changes the default to db???
+    cap_add:
+      - SYS_PTRACE # allow strace debugging
 
 volumes:
   amanda_tarlists:

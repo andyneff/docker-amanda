@@ -1,22 +1,17 @@
 FROM vsiri/recipe:tini AS tini
 
-FROM debian:8
+FROM centos:7
 LABEL maintainer="Andrew Neff <andrew.neff@visionsystemsinc.com>"
 
 SHELL ["bash", "-euxvc"]
 
-# Install amanda and amanda compatible mailer
-RUN apt-get update; \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        ca-certificates openssh-server \
-        libxml-simple-perl libjson-perl liburi-escape-xs-perl \
-        libdata-dumper-simple-perl libencode-locale-perl curl; \
-    curl -LO https://www.zmanda.com/downloads/community/Amanda/3.5.1/Debian-8.1/amanda-backup-client_3.5.1-1Debian81_amd64.deb; \
-    dpkg -i /amanda-backup-client*.deb || :; \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -f; \
-    DEBIAN_FRONTEND=noninteractive apt-get purge -y curl --auto-remove; \
-    rm /amanda-backup*.deb; \
-    rm /etc/ssh/ssh_host*
+# Install amanda
+RUN yum install -y \
+        ca-certificates openssh-clients openssh-server perl-JSON \
+        perl-Encode-Locale perl-URI \
+        perl-Data-Dumper perl-XML-Simple \
+        https://www.zmanda.com/downloads/community/Amanda/3.5.1/Redhat_Enterprise_7.0/amanda-backup_client-3.5.1-1.rhel7.x86_64.rpm; \
+    rm -rf /var/cache/yum/*
 
 # Install recipes
 COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini

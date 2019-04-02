@@ -2,25 +2,19 @@ FROM vsiri/recipe:tini AS tini
 FROM vsiri/recipe:gosu AS gosu
 FROM vsiri/recipe:ep AS ep
 
-FROM debian:8
+FROM centos:7
 LABEL maintainer="Andrew Neff <andrew.neff@visionsystemsinc.com>"
 
 SHELL ["bash", "-euxvc"]
 
 # Install amanda and amanda compatible mailer
-RUN apt-get update; \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        ca-certificates mt-st mutt openssh-client gnuplot-nox libjson-perl \
-        libencode-locale-perl gettext openssh-server bsd-mailx libcurl3 aespipe\
-        libdata-dumper-simple-perl libxml-simple-perl curl; \
-    curl -LO https://www.zmanda.com/downloads/community/Amanda/3.5.1/Debian-8.1/amanda-backup-server_3.5.1-1Debian81_amd64.deb; \
-    mkdir -p /root/.gnupg/private-keys-v1.d; \
-    chmod 700 /root/.gnupg/private-keys-v1.d /root/.gnupg; \
-    dpkg -i /amanda-backup-server*.deb || :; \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -f; \
-    DEBIAN_FRONTEND=noninteractive apt-get purge -y curl --auto-remove; \
-    rm /amanda-backup*.deb; \
-    rm /etc/ssh/ssh_host*
+RUN yum install -y epel-release; \
+    yum install -y \
+        ca-certificates mt-st mutt openssh-clients openssh-server gnuplot perl-JSON \
+        perl-Encode-Locale gettext mailx libcurl aespipe \
+        perl-Data-Dumper perl-XML-Simple curl \
+        https://www.zmanda.com/downloads/community/Amanda/3.5.1/Redhat_Enterprise_7.0/amanda-backup_server-3.5.1-1.rhel7.x86_64.rpm; \
+    rm -rf /var/cache/yum/*
 
 # Install recipes
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
@@ -42,6 +36,14 @@ RUN mkdir /etc/amanda/persist; \
     chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/.gnupg/secring.gpg ;\
     chmod 755 /etc/amanda/vsidata; \
     chmod 600 /etc/amanda/vsidata/*; \
+
+    # For for https://github.com/zmanda/amanda/issues/99
+    mkdir /var/lib/amanda/template.d; \
+    cd /var/lib/amanda/template.d; \
+    curl -LO https://raw.githubusercontent.com/zmanda/amanda/tags/community_3_5_1/example/template.d/tapetypes; \
+    curl -LO https://raw.githubusercontent.com/zmanda/amanda/tags/community_3_5_1/example/template.d/dumptypes; \
+    chown -R amandabackup:disk /var/lib/amanda/template.d; \
+
     gosu ${BACKUP_USERNAME} mkdir /etc/amanda/template.d; \
     gosu ${BACKUP_USERNAME} cp /var/lib/amanda/template.d/*types /etc/amanda/template.d; \
     chmod 755 /usr/local/bin/htmlmutt; \

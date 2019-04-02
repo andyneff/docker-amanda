@@ -6,8 +6,8 @@ services:
     build:
       context: .
       dockerfile: docker/server.Dockerfile
-      args:
-        AMANDA_VERSION: "${AMANDA_VERSION}"
+      # args:
+      #   AMANDA_VERSION: "${AMANDA_VERSION}"
     image: ${AMANDA_DOCKER_REPO}:server
     volumes:
       - /holding:/holding

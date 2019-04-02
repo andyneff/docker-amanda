@@ -6,8 +6,8 @@ services:
     build:
       context: .
       dockerfile: docker/client.Dockerfile
-      args:
-        AMANDA_VERSION: "${AMANDA_VERSION}"
+      # args:
+      #   AMANDA_VERSION: "${AMANDA_VERSION}"
     image: ${AMANDA_DOCKER_REPO}:client
     ports:
     - "${AMANDA_CLIENT_SSH_IP}:${AMANDA_CLIENT_SSH_PORT}:22"

@@ -1,5 +1,4 @@
 FROM vsiri/recipe:tini AS tini
-FROM vsiri/recipe:amanda_deb AS zmanda
 
 FROM debian:8
 LABEL maintainer="Andrew Neff <andrew.neff@visionsystemsinc.com>"
@@ -7,14 +6,15 @@ LABEL maintainer="Andrew Neff <andrew.neff@visionsystemsinc.com>"
 SHELL ["bash", "-euxvc"]
 
 # Install amanda and amanda compatible mailer
-COPY --from=zmanda /amanda-backup-client*.deb /
 RUN apt-get update; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         ca-certificates openssh-server \
         libxml-simple-perl libjson-perl liburi-escape-xs-perl \
-        libdata-dumper-simple-perl libencode-locale-perl; \
+        libdata-dumper-simple-perl libencode-locale-perl curl; \
+    curl -LO https://www.zmanda.com/downloads/community/Amanda/3.5.1/Debian-8.1/amanda-backup-client_3.5.1-1Debian81_amd64.deb; \
     dpkg -i /amanda-backup-client*.deb || :; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -f; \
+    DEBIAN_FRONTEND=noninteractive apt-get purge -y curl --auto-remove; \
     rm /amanda-backup*.deb; \
     rm /etc/ssh/ssh_host*
 

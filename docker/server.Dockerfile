@@ -48,7 +48,7 @@ RUN mkdir /etc/amanda/persist; \
     chmod 755 /server_entrypoint.bsh; \
     ln -sf /etc/keys/.am_passphrase /var/lib/amanda/.am_passphrase; \
     ln -sf /etc/amanda/persist/vsidata/am_key.gpg /var/lib/amanda/.gnupg/am_key.gpg; \
-    ln -sf /etc/amanda/persist/amandates /etc/amandates; \
+    # ln -sf /etc/amanda/persist/amandates /etc/amandates; \
     ln -s /etc/amanda/persist/dumpdates /etc/dumpdates; \
     sed -i 's|uuencode -m -|openssl base64|' /usr/sbin/amaespipe
 

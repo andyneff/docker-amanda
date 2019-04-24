@@ -39,10 +39,19 @@ For some reason, this never worked on Synology NASes. Instead, a reverse activat
 de_reverse_activate myusername@myhostname username@client # Doesn't work anymore on newer DSM
 ```
 
-If the client is a server (like Synology) where *only* root has docker access, and root has no password, you have to log in first, `sudo su -` to root, and then reverse port forward back to your local machine. This "reverse activate" can be done using the `de_reverse_activate` instead:
+However using the following will `sudo` (on Synology) to `root` and work.
+
+If the client is a computer (like Synology) where *only* `root` has docker access, and `root` has no password, you have to log in first, and then use `sudo` to reverse port forward back to your local machine. This elevation can be done using the `CHANGE_USER` variable:
+
 
 ```bash
-CHANGE_USER="sudo su - root -c" de_activate myusername@myhostname username@client
+CHANGE_USER="sudo" de_activate myusername@myhostname username@client
+```
+
+In even more complicated situations, the elevation command can only take one argument (like `su -c`). In these cases, use the `CHANGE_SINGLE` variable instead. The advanced quoting will be taken care of for you.
+
+```bash
+CHANGE_SINGLE="sudo su - root -c" de_activate myusername@myhostname username@client
 ```
 
 These commands don't handle extra gateways in between, etc... But it would be possible to modify them to whatever your configuration is
@@ -87,6 +96,8 @@ Fire this docker up and forget your backup worries (it auto restart).
 ```bash
 just client
 ```
+
+<kbd>Ctrl</kbd> + <kbd>c</kbd> to stop watching the logs
 
 ## Server
 

@@ -23,36 +23,28 @@ chown "${BACKUP_USERNAME}:${BACKUP_GROUP}" \
     "/etc/amanda/${AMANDA_CONFIG_NAME}/advanced.conf" \
     "${HOME_DIR}/.amandahosts"
 
-if [ "$(stat -c %U:%G "/etc/amanda/${AMANDA_CONFIG_NAME}")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
-  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} "/etc/amanda/${AMANDA_CONFIG_NAME}"
-fi
+function permit()
+{
+  if [ "$(stat -c %U:%G "${1}")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
+    mkdir -p "${1}"
+    chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} "${1}"
+  fi
+}
 
-if [ "$(stat -c %U:%G "/etc/amanda/persist/${AMANDA_CONFIG_NAME}")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
-  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} "/etc/amanda/persist/${AMANDA_CONFIG_NAME}"
-fi
+permit "/etc/amanda/${AMANDA_CONFIG_NAME}"
 
-if [ "$(stat -c %U:%G /holding/hd1)" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
-  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /holding/hd1
-fi
+permit "/etc/amanda/persist/${AMANDA_CONFIG_NAME}"
 
-if [ "$(stat -c %U:%G "${GNUPGHOME}")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
-  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/keys
-fi
+permit /holding/hd1
+
+permit /etc/keys
 chmod 700 /etc/keys
 
-if [ "$(stat -c %U:%G "/var/amanda")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
-  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/amanda
-fi
+# permit /var/amanda
 
-if [ "$(stat -c %U:%G "/var/log/amanda")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
-  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/log/amanda
-fi
+permit /var/log/amanda
 
-if [ "$(stat -c %U:%G "/tmp/amanda")" != "${BACKUP_USERNAME}:${BACKUP_GROUP}" ]; then
-  chown -R ${BACKUP_USERNAME}:${BACKUP_GROUP} /tmp/amanda
-fi
-
-
+permit /tmp/amanda
 
 if ! [ -e "/etc/keys/ssh_host_rsa_key" ]; then
   ssh-keygen -t rsa -N "" -f /etc/keys/ssh_host_rsa_key >& /dev/null

@@ -35,7 +35,8 @@ RUN chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/* /var/lib/amanda/.
     chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /var/lib/amanda/.gnupg/secring.gpg; \
     chmod 755 /client_entrypoint.bsh; \
     chown ${BACKUP_USERNAME}:${BACKUP_GROUP} /etc/amanda/amanda-client.conf; \
-    chmod 640 /etc/amanda/amanda-client.conf
+    chmod 640 /etc/amanda/amanda-client.conf; \
+    ln -sf /var/lib/amanda/gnutar-lists/amandates /var/amanda/amandates
 
 # Customize sshd
 RUN sed -i 's|HostKey /etc/ssh|HostKey /etc/keys|' /etc/ssh/sshd_config; \

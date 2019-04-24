@@ -10,7 +10,7 @@ services:
       #   AMANDA_VERSION: "${AMANDA_VERSION}"
     image: ${AMANDA_DOCKER_REPO}:client
     ports:
-    - "${AMANDA_CLIENT_SSH_IP}:${AMANDA_CLIENT_SSH_PORT}:22"
+      - "${AMANDA_CLIENT_SSH_IP}:${AMANDA_CLIENT_SSH_PORT}:22"
     volumes:
       - amanda_tarlists:/var/lib/amanda/gnutar-lists
       - amanda_keys:/etc/keys

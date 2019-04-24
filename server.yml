@@ -15,7 +15,7 @@ services:
       - amanda-config:/etc/amanda/persist/${AMANDA_CONFIG_NAME}
       - amanda-keys:/etc/keys
       - amanda-logs:/var/log/amanda
-      - amanda-var:/var/amanda
+      # - amanda-var:/var/amanda
       - amanda-tmp:/tmp/amanda
     devices:
       - "${AMANDA_TAPE_DRIVE}:${AMANDA_TAPE_DRIVE}"
@@ -81,5 +81,5 @@ volumes:
   amanda-config:
   amanda-keys:
   amanda-logs:
-  amanda-var:
+  # amanda-var:
   amanda-tmp:

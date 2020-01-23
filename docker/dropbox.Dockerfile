@@ -1,4 +1,5 @@
 FROM vsiri/recipe:gosu as gosu
+FROM vsiri/recipe:tini as tini
 FROM alpine:latest AS dropbox
 
 SHELL ["sh", "-euxvc"]
@@ -25,6 +26,7 @@ RUN apt-get update; \
 COPY --from=dropbox /dropbox /dropbox
 # Install gosu
 COPY --from=gosu /usr/local/bin/gosu /usr/local/bin/gosu
+COPY --from=tini /usr/local/bin/tini /usr/local/bin/tini
 
 ADD docker/dropbox_entrypoint.bsh /
 
@@ -32,6 +34,6 @@ RUN chmod 755 /dropbox_entrypoint.bsh
 
 VOLUME /dropbox
 
-ENTRYPOINT ["/dropbox_entrypoint.bsh"]
+ENTRYPOINT ["/usr/local/bin/tini", "--", "/dropbox_entrypoint.bsh"]
 
 CMD ["/dropbox/.dropbox-dist/dropboxd"]

@@ -25,6 +25,10 @@ function caseify()
       justify build_recipes gosu tini vsi amanda_deb ep
       justify server build server
       ;;
+    build_dropbox) # Build dropbox
+      justify build_recipes gosu tini
+      Docker-compose -f "${AMANDA_CWD}/dropbox.yml" build
+      ;;
     push) # Push to dockerhub
       justify client push
       justify server push server

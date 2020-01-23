@@ -11,7 +11,9 @@ RUN apt-get update; \
         ca-certificates openssh-server \
         libxml-simple-perl libjson-perl liburi-escape-xs-perl \
         libdata-dumper-simple-perl libencode-locale-perl curl; \
-    curl -LO https://www.zmanda.com/downloads/community/Amanda/3.5.1/Debian-8.1/amanda-backup-client_3.5.1-1Debian81_amd64.deb; \
+    curl -fsSLO https://cdn.zmanda.com/downloads/community/Amanda/3.5.1/Debian-8.1/amanda-backup-client_3.5.1-1Debian81_amd64.deb; \
+    # Verify the download is a valid deb file
+    dpkg -I /amanda-backup-client*.deb ; \
     dpkg -i /amanda-backup-client*.deb || :; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -f; \
     DEBIAN_FRONTEND=noninteractive apt-get purge -y curl --auto-remove; \

@@ -63,6 +63,8 @@ ssh fileserver -i /etc/keys/id_rsa -p 10070 find /fileserver/projects /fileserve
   echo "fileserver ${dir_name} server-compress-encrypt-user-tar-span 2" >> "/etc/amanda/${AMANDA_CONFIG_NAME}/disklist"
 done
 
+chown "${BACKUP_USERNAME}:${BACKUP_GROUP}" "/etc/amanda/${AMANDA_CONFIG_NAME}/disklist"
+
 if [ "$1" == "sshd" ]; then
   exec /usr/sbin/sshd -D -e
 else

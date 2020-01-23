@@ -28,7 +28,7 @@ define taperscan lexical-scan {
 taperscan "lexical-scan"
 
 device_property "LEOM" "FALSE"
-tapetype hplto7 # what kind of tape it is
+tapetype hplto8_lto7 # what kind of tape it is
 labelstr "^vsidata-[0-9][0-9]*$"  # label constraint regex: all tapes must match
 dtimeout 3600 # number of idle seconds before a dump is aborted
 ctimeout 15 # max number of secconds amcheck waits for each client
@@ -59,6 +59,18 @@ define tapetype hplto7 {
   length 5875238336 kbytes
   filemark 70 kbytes #1.15 Inches
   speed 100629 kps
+  blocksize 32 kbytes
+  part_size 100G
+  part_cache_type disk
+  #part_cache_max_size 100G
+  part_cache_dir "/cache"
+}
+
+define tapetype hplto8_lto7 {
+  comment "Created by amtapetype; compression enabled"
+  length 5875169952 kbytes
+  filemark 1618 kbytes
+  speed 74820 kps
   blocksize 32 kbytes
   part_size 100G
   part_cache_type disk

@@ -13,9 +13,11 @@ RUN apt-get update; \
         ca-certificates mt-st mutt openssh-client gnuplot-nox libjson-perl \
         libencode-locale-perl gettext openssh-server bsd-mailx libcurl3 aespipe\
         libdata-dumper-simple-perl libxml-simple-perl curl; \
-    curl -LO https://www.zmanda.com/downloads/community/Amanda/3.5.1/Debian-8.1/amanda-backup-server_3.5.1-1Debian81_amd64.deb; \
+    curl -fsSLO https://cdn.zmanda.com/downloads/community/Amanda/3.5.1/Debian-8.1/amanda-backup-server_3.5.1-1Debian81_amd64.deb; \
     mkdir -p /root/.gnupg/private-keys-v1.d; \
     chmod 700 /root/.gnupg/private-keys-v1.d /root/.gnupg; \
+    # Verify the download is a valid deb file
+    dpkg -I /amanda-backup-server*.deb ; \
     dpkg -i /amanda-backup-server*.deb || :; \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -f; \
     DEBIAN_FRONTEND=noninteractive apt-get purge -y curl --auto-remove; \

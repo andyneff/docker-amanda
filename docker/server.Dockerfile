@@ -68,9 +68,6 @@ ENV TZ="US/Eastern"
 #sshd
 EXPOSE 22
 
-# Create internal volumes
-VOLUME /etc/amanda
-
 ENTRYPOINT ["/usr/local/bin/tini", "--", "/usr/bin/env", "bash", "/server_entrypoint.bsh"]
 
 CMD ["sshd"]

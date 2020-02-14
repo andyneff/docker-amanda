@@ -127,11 +127,12 @@ In case the backup server is "lost" due to a disaster, it would be good to have 
 1. `/dropbox/dropbox.py exclude add *`
 1. `/dropbox/dropbox.py exclude remove amanda_etc`
 1. `/dropbox/dropbox.py status`
-    1. You can probably ignore UnicodeEncodeError: 'ascii' codec can't encode character u'\u2022' in position 20: ordinal not in range(128)
     1. Repeat until you get the "Up to date"
 1. If this is the first time setting this up, and you are not restoring from the dropbox backup
     1. `ln -sf "/dropbox/Dropbox (VSI)/amanda_etc" /dropbox/Dropbox/amanda_etc`
 1. `exit`
+
+Dropbox will no longer sync read only files. It will mark them as "unsyncable". Create a one way sync with `lsyncd`
 
 #### Restoring from Dropbox backup
 

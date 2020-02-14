@@ -29,6 +29,7 @@ taperscan "lexical-scan"
 
 device_property "LEOM" "FALSE"
 tapetype hplto8_lto7 # what kind of tape it is
+# tapetype hplto7 # what kind of tape it is
 labelstr "^vsidata-[0-9][0-9]*$"  # label constraint regex: all tapes must match
 dtimeout 3600 # number of idle seconds before a dump is aborted
 ctimeout 15 # max number of secconds amcheck waits for each client

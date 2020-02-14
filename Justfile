@@ -64,7 +64,7 @@ function caseify()
     backup) # Start a backup on the server
       justify server run -d backup
       # justify server logs -f backup
-      justify backup logs
+      # justify backup logs
       ;;
 
     backup_logs) # Show the backup logs

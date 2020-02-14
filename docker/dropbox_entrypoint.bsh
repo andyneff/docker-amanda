@@ -21,4 +21,23 @@ if ! [ -d /dropbox/.dropbox ]; then
   echo "Now you have a clean slate. Go and PROFIT!"
 fi
 
+cat << EOF > /etc/lsyncd.conf
+settings {
+  nodaemon = true
+}
+
+sync {
+   default.rsync,
+   source = "/dropbox/amanda_etc",
+   target = "/dropbox/Dropbox/amanda_etc",
+   delete = true,
+   rsync = {
+     archive = true,
+     copy_links = true
+   }
+}
+EOF
+
+lsyncd /etc/lsyncd.conf &
+
 exec gosu dropbox "${@}"

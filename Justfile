@@ -25,20 +25,20 @@ function caseify()
       justify build_recipes gosu tini vsi amanda_deb ep
       justify server build server
       ;;
-    build_dropbox) # Build dropbox
-      justify build_recipes gosu tini
-      Docker-compose -f "${AMANDA_CWD}/dropbox.yml" build
-      ;;
+    # build_dropbox) # Build dropbox
+    #   justify build_recipes gosu tini
+    #   Docker-compose -f "${AMANDA_CWD}/dropbox.yml" build
+    #   ;;
     push) # Push to dockerhub
       justify client push
       justify server push server
       ;;
-    dropbox) # Start dropbox daemon
-      Docker-compose -f "${AMANDA_CWD}/dropbox.yml" up -d --build --force-recreate
-      ;;
-    dropbox_status) # Get dropbox daemon status
-      Docker-compose -f "${AMANDA_CWD}/dropbox.yml" exec dropbox gosu dropbox /dropbox/dropbox.py status
-      ;;
+    # dropbox) # Start dropbox daemon
+    #   Docker-compose -f "${AMANDA_CWD}/dropbox.yml" up -d --build --force-recreate
+    #   ;;
+    # dropbox_status) # Get dropbox daemon status
+    #   Docker-compose -f "${AMANDA_CWD}/dropbox.yml" exec dropbox gosu dropbox /dropbox/dropbox.py status
+    #   ;;
     client) # Run docker compose command for the client. E.g. "client run"
       if [ "$#" = "0" ]; then
         justify client up -d amandad
@@ -177,6 +177,15 @@ function caseify()
       ;;
     recover) # Start amrecover
       justify client run amandad amrecover "${AMANDA_CONFIG_NAME}"
+      ;;
+    onedrive_login) # Login and list IT drive ids
+      Docker-compose -f onedrive.yml run onedrive_login
+      ;;
+    onedrive_up) # Start onedrive monitor
+      Docker-compose -f onedrive.yml up -d onedrive
+      ;;
+    onedrive_logs) # Show logs for onedrive monitor
+      Docker-compose -f onedrive.yml logs -f onedrive
       ;;
     *)
       defaultify "${just_arg}" ${@+"${@}"}

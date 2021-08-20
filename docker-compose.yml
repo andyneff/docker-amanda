@@ -12,8 +12,8 @@ services:
     ports:
       - "${AMANDA_CLIENT_SSH_IP}:${AMANDA_CLIENT_SSH_PORT}:22"
     volumes:
-      - amanda_tarlists:/var/lib/amanda/gnutar-lists
-      - amanda_keys:/etc/keys
+      - amanda-client-tarlists:/var/lib/amanda/gnutar-lists
+      - amanda-client-keys:/etc/keys
       - /volume2/admin:/admin:ro
       - /volume2/ITAR:/ITAR:ro
       - /volume2/fileserver:/fileserver:ro
@@ -30,5 +30,5 @@ services:
       - SYS_PTRACE # allow strace debugging
 
 volumes:
-  amanda_tarlists:
-  amanda_keys:
+  amanda-client-tarlists:
+  amanda-client-keys:

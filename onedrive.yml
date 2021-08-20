@@ -1,0 +1,25 @@
+version: '3.3'
+
+services:
+  onedrive: &onedrive
+    image: driveone/onedrive
+    hostname: amanda_onedrive
+    environment:
+      - ONEDRIVE_UID=63998
+      - ONEDRIVE_GID=6
+    volumes:
+      - type: volume
+        source: amanda-config
+        target: /onedrive/data/amanda_index
+        read_only: true
+      - type: bind
+        source: /root/onedrive
+        target: /onedrive/conf
+    restart: always
+  onedrive_login:
+    <<: *onedrive
+    command: --confdir /onedrive/conf --get-O365-drive-id it
+    restart: never
+
+volumes:
+  amanda-config:

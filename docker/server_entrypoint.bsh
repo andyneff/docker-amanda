@@ -46,6 +46,8 @@ permit /var/log/amanda
 
 permit /tmp/amanda
 
+permit /cache
+
 if ! [ -e "/etc/keys/ssh_host_rsa_key" ]; then
   ssh-keygen -t rsa -N "" -f /etc/keys/ssh_host_rsa_key >& /dev/null
   ssh-keygen -t ed25519 -N "" -f /etc/keys/ssh_host_ed25519_key >& /dev/null

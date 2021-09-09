@@ -57,6 +57,6 @@ ENV BACKUP_UID=63998 \
 
 EXPOSE 22
 
-ENTRYPOINT ["/usr/local/bin/tini", "--", "/client_entrypoint.bsh"]
+ENTRYPOINT ["/usr/local/bin/tini", "--", "/usr/bin/env", "bash", "/client_entrypoint.bsh"]
 
 CMD ["/usr/sbin/sshd", "-D", "-e"]

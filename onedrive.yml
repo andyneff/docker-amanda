@@ -18,7 +18,7 @@ services:
     restart: always
   onedrive_login:
     <<: *onedrive
-    command: --confdir /onedrive/conf --get-O365-drive-id it
+    command: --confdir /onedrive/conf --logout --get-O365-drive-id it
     restart: never
 
 volumes:
